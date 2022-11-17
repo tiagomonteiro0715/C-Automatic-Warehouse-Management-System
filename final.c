@@ -2,13 +2,14 @@
 
 Trabalho final ano passado: https://github.com/tiagomonteiro0715/pm/blob/main/code/final.c
 
+2017 2018 - https://github.com/tiagomonteiro0715/Microprocessor-Programming/blob/main/PMAED-verao-2022/2-pm-trabalho-2017-2018/code/main.c 
 
 Ler resto do trabalho ponta a ponta e fazer já funções básicas. 
 È agora que se define toda a estrutura do trabalho.
 
 Por bem o nome das variaveis em portugues e em variaveis com numeros colocar #define's
 
-
+abrir ficherio .dat para ver formato
 */
 
 
@@ -24,7 +25,7 @@ Por bem o nome das variaveis em portugues e em variaveis com numeros colocar #de
 #define MAX_DATE_STR 12
 
 #define NUM_PRATELEIRAS 5
-#define LATERAL_SIZE 50
+#define LATERAL_SIZE 49
 
 
 typedef struct lote {
@@ -37,11 +38,27 @@ typedef struct lote {
 
 typedef struct prateleira {
   size_t LOTE;
-  char xPosition[49];
-  char yPosition[49];
+  char Position[49][49];
 } PRATELEIRA;
 
 PRATELEIRA armazem[4];
+
+//-----------------------------------------------------------------------------------------------------------
+
+int readBinary() {
+  FILE * fp;
+
+  fp = fopen("file.data", "rb");
+  if (fp == NULL) {
+    printf("Error opening binary file\n");
+    exit(1);
+  }
+  //reler enunciato todo + 
+
+  fclose(fp);
+
+  return 0;
+}
 
 void showMenu() {
 
