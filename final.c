@@ -24,9 +24,10 @@ como fazer com que o menu apareça uma só vez??
 apresentada numa matriz 4x4, com o ID do lote e o seu tipo (ver Figura 6). - onde é que o tipo fica?? é suposto contagenar o IR com o tipo? -- ID_Tipo
 */
 
-
 #include <stdio.h>
+
 #include <stdlib.h>
+
 #include <string.h>
 
 #define bool int
@@ -40,35 +41,65 @@ apresentada numa matriz 4x4, com o ID do lote e o seu tipo (ver Figura 6). - ond
 #define NUM_PRATELEIRAS 4
 #define LATERAL_SIZE 9
 
-
 typedef struct lote {
   int id;
   char destiny[MAX_DESTINY_STR];
   char date[MAX_DATE_STR];
   int quantity;
   int type;
-} LOTE;
-
+}
+LOTE;
 
 typedef struct prateleira {
   size_t LOTE;
   char Position[LATERAL_SIZE][LATERAL_SIZE][NUM_PRATELEIRAS];
-} PRATELEIRA;
+}
+PRATELEIRA;
 
-
-LOTE exemplo_Um_Binario= { 1, "Sintra", "2022-07-16", 50, 2};
-LOTE exemplo_Dois_Binario= { 2, "Lisboa", "2022-08-05", 50, 2};
-LOTE exemplo_Tres_Binario= { 3, "Lisboa", "2022-05-27", 50, 2};
-LOTE exemplo_Quatro_Binario= { 4, "Porto", "2022-03-12", 50, 2};
-LOTE exemplo_Cinco_Binario= { 5, "Sintra", "2022-11-07", 50, 2};
+LOTE exemplo_Um_Binario = {
+  1,
+  "Sintra",
+  "2022-07-16",
+  50,
+  2
+};
+LOTE exemplo_Dois_Binario = {
+  2,
+  "Lisboa",
+  "2022-08-05",
+  50,
+  2
+};
+LOTE exemplo_Tres_Binario = {
+  3,
+  "Lisboa",
+  "2022-05-27",
+  50,
+  2
+};
+LOTE exemplo_Quatro_Binario = {
+  4,
+  "Porto",
+  "2022-03-12",
+  50,
+  2
+};
+LOTE exemplo_Cinco_Binario = {
+  5,
+  "Sintra",
+  "2022-11-07",
+  50,
+  2
+};
 
 //-----------------------------------------------------------------------------------------------------------
 
-int showTray(){
+int showTray() {
   char inputTray[100];
-  FILE * fp ;
+  int testingVar;
+  FILE * fp;
 
-  getchar();// Para apanhar o [enter]
+  getchar(); // Para apanhar o [enter]
 
   printf("Filename: ");
   scanf("%s", inputTray);
@@ -78,16 +109,22 @@ int showTray(){
     printf("Error opening text file\n");
     exit(1);
   }
-//https://www.youtube.com/watch?v=TzNhPOwjlb0
-//depois deste video usar só read para ler o ficheiro .dat
-//ver trabalho de ano passado na drive do NEEC como leram ficheiros .dat e como está no livro
 
-/*FIQUEI AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII*/
+  while ((EOF)) {
+    fscanf(fp, "%d ,%[^  ]", & testingVar, inputTray);
+
+    printf("\n\nid: %d name: %s\n\n", testingVar, inputTray);
+
+  }
+  //https://www.youtube.com/watch?v=TzNhPOwjlb0
+  //depois deste video usar só read para ler o ficheiro .dat
+  //ver trabalho de ano passado na drive do NEEC como leram ficheiros .dat e como está no livro
+
+  /*FIQUEI AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII*/
   fclose(fp);
   return 0;
 
 }
-
 
 void showMenu() {
 
@@ -117,7 +154,6 @@ void choices() {
     printf("Error opening warehouse file\n");
     exit(1);
   }
-
 
   while (choiceSucess == 0) {
     choice = getchar();
@@ -151,8 +187,8 @@ void choices() {
 
 int main() {
 
-    showMenu();
+  showMenu();
 
-choices();
+  choices();
 
 }
