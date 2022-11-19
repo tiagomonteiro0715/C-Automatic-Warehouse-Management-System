@@ -1,4 +1,6 @@
-/*trabalho 8 - ajudar nas estruturas: https://github.com/tiagomonteiro0715/Microprocessor-Programming/blob/main/PMAED-verao-2022/0.%20j%C3%A1%20feito/0PmTrabalhosEstruturas/code/final.c
+/*Trabalhos finais exemplo: https://drive.google.com/drive/folders/1HxeEVTvkbPwr7rqXdTxJYXjMMOCx81kV 
+
+trabalho 8 - ajudar nas estruturas: https://github.com/tiagomonteiro0715/Microprocessor-Programming/blob/main/PMAED-verao-2022/0.%20j%C3%A1%20feito/0PmTrabalhosEstruturas/code/final.c
 
 Trabalho final ano passado: https://github.com/tiagomonteiro0715/pm/blob/main/code/final.c
 
@@ -11,21 +13,6 @@ na disposição anterior
 Cada lote tem 200 mm
 
 só deve trocar de lote quando a some de cartoes e livretes dá mais de 200 mm
-
-Duvida - ver se o 1º ponto de abrir o armazem quando o fichero abre está certo ou não.
-
-como ler um ficheiro binário????
-
-é preciso uma estrutura que diga como os tabuleiros devem estar dispostos. 
-Não, isso é na função de apresentação. no ficheiro texto está linha por linha
-
-como fazer com que o menu apareça uma só vez??
-
-apresentada numa matriz 4x4, com o ID do lote e o seu tipo (ver Figura 6). - onde é que o tipo fica?? é suposto contagenar o IR com o tipo? -- ID_Tipo 
-
-
-
-showTray - está bom assim ou coloco uma matriz para ficar tudo alinhado?
 */
 
 #include <stdio.h>
@@ -123,8 +110,10 @@ int showCompleteBatch() {
   showtray - fazer array para colocar lá os valores. fica melhor assim. como é uma função, depois de ussada a memoria é apagada.
 
   ver trabalho de ano passado emeplo para ver como eles virem ficheiro .dat to paulo pinto
+  https://drive.google.com/drive/folders/1v45X6u5w6w3YKVon-BL_h6I-yHi-4oaM
 
   https://stackoverflow.com/questions/35820879/read-a-dat-file-in-c
+  showTray - está bom assim ou coloco uma matriz para ficar tudo alinhado?
 
   ler livro de PM
   */
