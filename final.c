@@ -1,20 +1,3 @@
-/*Trabalhos finais exemplo: https://drive.google.com/drive/folders/1HxeEVTvkbPwr7rqXdTxJYXjMMOCx81kV 
-
-trabalho 8 - ajudar nas estruturas: https://github.com/tiagomonteiro0715/Microprocessor-Programming/blob/main/PMAED-verao-2022/0.%20j%C3%A1%20feito/0PmTrabalhosEstruturas/code/final.c
-
-Trabalho final ano passado: https://github.com/tiagomonteiro0715/pm/blob/main/code/final.c
-
-2017 2018 - https://github.com/tiagomonteiro0715/Microprocessor-Programming/blob/main/PMAED-verao-2022/2-pm-trabalho-2017-2018/code/main.c 
-
-Assim, o sistema de expedição deverá distribuir os Lotes seleccionados consoante as quantidades
-(size) e os tipos (1 mm para Cartões e 4 mm para Livretes) pelas caixas (altura interior de 200 mm)
-na disposição anterior
-
-Cada lote tem 200 mm
-
-só deve trocar de lote quando a some de cartoes e livretes dá mais de 200 mm
-*/
-
 #include <stdio.h>
 
 #include <stdlib.h>
@@ -59,18 +42,25 @@ void le_lote(LOTE * ptr) {
 
 //-----------------------------------------------------------------------------------------------------------
 
-int showTray() {
+int showTray(bool override) {
   char inputTray[100];
   int testingVar;
   FILE * fp;
   char str[60];
   int i = 1;
-  getchar(); // Para apanhar o [enter]
 
+  if (override== FALSE){
+  getchar(); // Para apanhar o [enter]
   printf("Filename: ");
   scanf("%s", inputTray);
   printf("\n");
   fp = fopen(inputTray, "r");
+  }else{
+    fp = fopen("tray.txt", "r");
+  }
+
+
+
   if (fp == NULL) {
     printf("Error opening text file\n");
     exit(1);
@@ -84,9 +74,18 @@ int showTray() {
     }
     i = i + 1;
   }
-  //https://www.youtube.com/watch?v=TzNhPOwjlb0
-  //depois deste video usar só read para ler o ficheiro .dat
-  //ver trabalho de ano passado na drive do NEEC como leram ficheiros .dat e como está no livro
+  
+
+//tentativa de ler ficheiro warehouse.dat
+/*
+  char buffer[10];
+   while (feof(fp) != EOF) // to read file
+    {
+      fread(buffer, sizeof(char), 1, fp);
+      printf("\n%s", buffer);
+   }
+*/
+
 
   fclose(fp);
   return 0;
@@ -104,16 +103,6 @@ int showCompleteBatch() {
 
   /*
   fread binary file c
-
-  como ver estrutura de ficheiro binário??
-
-  showtray - fazer array para colocar lá os valores. fica melhor assim. como é uma função, depois de ussada a memoria é apagada.
-
-  ver trabalho de ano passado emeplo para ver como eles virem ficheiro .dat to paulo pinto
-  https://drive.google.com/drive/folders/1v45X6u5w6w3YKVon-BL_h6I-yHi-4oaM
-
-  https://stackoverflow.com/questions/35820879/read-a-dat-file-in-c
-  showTray - está bom assim ou coloco uma matriz para ficar tudo alinhado?
 
   ler livro de PM
   */
@@ -154,7 +143,7 @@ void choices() {
     choice = getchar();
     switch (choice) {
     case '1':
-      showTray();
+      showTray(FALSE);
       showMenu();
       break;
     case '2':
@@ -182,10 +171,14 @@ void choices() {
 
 }
 
-int main() {
+int main(int argc, char * argv[]) {
+if (argc == 2) {
+    if (!(strcmp(argv[1], "tray.txt"))) {
+      showTray(TRUE);
 
+    }
+}
   showMenu();
-
   choices();
 
 }
