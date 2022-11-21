@@ -61,7 +61,7 @@ int showTray(bool override) {
 
 
 
-  if (fp == NULL) {
+  if (fp == NULL) {//d´a NULL porque n~ao est´a a apontar para nada
     printf("Error opening text file\n");
     exit(1);
   }
@@ -100,12 +100,29 @@ int showCompleteBatch() {
     printf("Error opening text file\n");
     exit(1);
   }
+  
 
   /*
   fread binary file c
-
-  ler livro de PM
+ tipo 1 - C - cartoes
+ tipo 2 - L - livretes
+ 
+ por isto bem na funç~ao showtray.txt
+ 
+ conctagenar ambos com _ e funç~ao de convers~ao de numero para letra. usar strcpy
   */
+  
+  
+  
+  /*
+  usar 5 freads. Um para cada tipo de informaçao separado por um espaço
+  4 freads:
+  1 para id e tipo
+  1 para destino
+  1 para quantidade
+  1 para data de expediçao
+  */
+
 
   return 0;
 }
@@ -175,10 +192,8 @@ int main(int argc, char * argv[]) {
 if (argc == 2) {
     if (!(strcmp(argv[1], "tray.txt"))) {
       showTray(TRUE);
-
     }
 }
   showMenu();
   choices();
-
 }
