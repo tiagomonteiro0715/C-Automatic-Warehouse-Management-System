@@ -16,16 +16,19 @@
 #define NUM_PRATELEIRAS 4
 #define LATERAL_SIZE 9
 
-typedef struct lote {
+/****************************************************************
+*****************  Declaração de estruturas  ********************
+****************************************************************/
+struct loteCompleto {
   unsigned int id;//4 bytes
   char destiny[MAX_DESTINY_STR];//30 bytes
   char date[MAX_DATE_STR];//12 bytes
   unsigned int quantity;//4 bytes
   unsigned int type;//4 bytes
-}LOTE;
+};
 
 typedef struct slot {
-  LOTE;//4 bytes
+  struct loteCompleto lote;
   unsigned int flag;//0 - livre || 1 - ocupado
 }SLOT;
 
@@ -43,13 +46,14 @@ void le_lote(LOTE * ptr) {
 
 void le_lote(SLOT * ptr) {
   printf("\n\n id: %u destiny:%s date:%s quantity:%u type:%u",
-    ( * ptr).id,
-    ( * ptr).destiny,
-    ( * ptr).date,
-    ( * ptr).quantity,
-    ( * ptr).type
+    ( * ptr).lote.id,
+    ( * ptr).lote.destiny,
+    ( * ptr).lote.date,
+    ( * ptr).lote.quantity,
+    ( * ptr).lote.type
   );
 }
+
 
 void le_slot(SLOT * ptr) {
   le_lote(ptr);
@@ -58,14 +62,27 @@ void le_slot(SLOT * ptr) {
 
   );
 }
-//-----------------------------------------------------------------------------------------------------------
+/****************************************************************
+***********************  Funções  *******************************
+****************************************************************/
+void convertNumToType(char saveCharVar[1], int inputInt){
+  if(inputInt == 0){
+    strcpy(saveCharVar, "_C");
+  }
+  if(inputInt == 1){
+    strcpy(saveCharVar, "_L");
+  }
+}
 
 int showTray(bool override) {
   char inputTray[100];
-  int testingVar;
+  int inputVar;
   FILE * fp;
   char str[60];
-  int i = 0;
+  int count = 0;
+  int c;
+  int typeVar;
+  char finalStr[15];
 
   if (override == FALSE) {
     getchar(); // Para apanhar o [enter]
@@ -83,12 +100,18 @@ int showTray(bool override) {
   }
 
   while (fgets(str, sizeof(str), fp)) {
-    fscanf(fp, "%d", & testingVar);
-    printf("%d ", testingVar);
-    if (!(i % 4)) {
+    fscanf(fp, "%d", &inputVar);// fscanf(fp, "%d %d", &inputVar, &typeVar);
+/*
+ve typeVar, com convertNumToType() muda e assim numa string base finalStr[15] adicionar o input. 
+*/
+    if (!(count % 4)) {
       printf("\n");
     }
-    i = i + 1;
+    c = inputVar + '0';
+
+    printf("%d ", inputVar);
+
+    count += 1;
   }
 
   //tentativa de ler ficheiro warehouse.dat
@@ -119,7 +142,7 @@ int showCompleteBatch() {
   }
 
 
-//será que é assim que se le o armazem??
+/*será que é assim que se le o armazem??
 for(int i = 0; i<=4;i++){
   for(int j = 0;j<=9;j++){
     for(int k = 0;k<=9;k++){
@@ -129,12 +152,13 @@ for(int i = 0; i<=4;i++){
     }
   }
 }
+*/
 
-/*
+
 	while(fread(&slotExample[9][9][4], sizeof(SLOT), 1, fp)){
 		le_slot(&slotExample[9][9][4]);
   }
-*/
+
 
   fclose(fp);
   /*
