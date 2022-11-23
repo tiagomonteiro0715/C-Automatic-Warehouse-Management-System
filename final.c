@@ -109,21 +109,26 @@ int showTray(bool override) {
 
 int showCompleteBatch() {
   FILE * fp = fopen("warehouse.dat", "rb");
-
   if (fp == NULL) {
     printf("Error opening text file\n");
     exit(1);
   }
 
   size_t varTest;
-  char * size = " "; 
-  char * enter = "\n";
-  //&& varTest != (fread(buff, sizeof(LOTE), 1, fp) == *size)
   LOTE * buff = malloc(sizeof(LOTE));
   while ((varTest = fread(buff, sizeof(LOTE), 1, fp)) > 0 ) {
-    if(varTest != *size || varTest != *enter){
       le_lote(buff); 
-    }
+    /*Links para me ajudarem
+    https://www.youtube.com/watch?v=aROgtACPjjg 
+    https://www.reddit.com/r/learnprogramming/comments/9183ys/structure_padding_functions/
+    https://stackoverflow.com/questions/4306186/structure-padding-and-packing
+    https://www.geeksforgeeks.org/structure-member-alignment-padding-and-data-packing/
+    https://www.javatpoint.com/structure-padding-in-c
+    https://www.scaler.com/topics/structure-padding-in-c/
+    https://www.geeksforgeeks.org/how-to-avoid-structure-padding-in-c/
+
+    
+    */
     
 
   }
