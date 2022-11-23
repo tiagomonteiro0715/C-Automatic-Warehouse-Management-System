@@ -4,6 +4,7 @@
 
 #include <string.h>
 
+
 #define bool int
 #define TRUE 1
 #define FALSE 0
@@ -16,23 +17,17 @@
 #define LATERAL_SIZE 9
 
 typedef struct lote {
-  unsigned int id;
-  char destiny[MAX_DESTINY_STR];
-  char date[MAX_DATE_STR];
-  unsigned int quantity;
-  unsigned int type;
-}
-LOTE;
+  unsigned int id;//4 bytes
+  char destiny[MAX_DESTINY_STR];//30 bytes
+  char date[MAX_DATE_STR];//12 bytes
+  unsigned int quantity;//4 bytes
+  unsigned int type;//4 bytes
+}LOTE;
 
-//static const LOTE loteVazio; //usamos static para iniciar todos os valores. Bem bom. Assim não os tenho que preenher - https://stackoverflow.com/questions/10927274/gcc-uninitialized-global-variables/10927409#10927409
-
-/*
-typedef struct prateleira {
-  size_t LOTE;
-  char Position[LATERAL_SIZE][LATERAL_SIZE][NUM_PRATELEIRAS];
-}
-PRATELEIRA;
-*/
+typedef struct slot {
+  LOTE;//4 bytes
+  unsigned int flag;//0 - livre || 1 - ocupado
+}SLOT;
 
 /*
 void le_lote(LOTE * ptr) {
@@ -46,8 +41,8 @@ void le_lote(LOTE * ptr) {
 }
 */
 
-void le_lote(LOTE * ptr) {
-  printf("\n\n id: %u destiny:%s date:%s quantity:%u type:%u\n",
+void le_lote(SLOT * ptr) {
+  printf("\n\n id: %u destiny:%s date:%s quantity:%u type:%u",
     ( * ptr).id,
     ( * ptr).destiny,
     ( * ptr).date,
@@ -55,7 +50,14 @@ void le_lote(LOTE * ptr) {
     ( * ptr).type
   );
 }
-LOTE exemploLote;
+
+void le_slot(SLOT * ptr) {
+  le_lote(ptr);
+  printf(" flag:%u\n",
+    ( * ptr).flag
+
+  );
+}
 //-----------------------------------------------------------------------------------------------------------
 
 int showTray(bool override) {
@@ -108,33 +110,19 @@ int showTray(bool override) {
 
 
 int showCompleteBatch() {
-  FILE * fp = fopen("warehouse.dat", "rb");
+
+  FILE * fp = fopen("warehouse.dat", "rb+");
+  SLOT slot;
   if (fp == NULL) {
     printf("Error opening text file\n");
     exit(1);
   }
 
-  size_t varTest;
-  LOTE * buff = malloc(sizeof(LOTE));
-  while ((varTest = fread(buff, sizeof(LOTE), 1, fp)) > 0 ) {
-      le_lote(buff); 
-    /*Links para me ajudarem
-    https://www.youtube.com/watch?v=aROgtACPjjg 
-    https://www.reddit.com/r/learnprogramming/comments/9183ys/structure_padding_functions/
-    https://stackoverflow.com/questions/4306186/structure-padding-and-packing
-    https://www.geeksforgeeks.org/structure-member-alignment-padding-and-data-packing/
-    https://www.javatpoint.com/structure-padding-in-c
-    https://www.scaler.com/topics/structure-padding-in-c/
-    https://www.geeksforgeeks.org/how-to-avoid-structure-padding-in-c/
-
-    
-    */
-    
-
+	while(fread(&slot, sizeof(SLOT), 1, fp)){
+		le_slot(&slot);
   }
-  free(buff);
 
-fclose(fp);
+  fclose(fp);
   /*
   fread binary file c
  tipo 1 - C - cartoes
@@ -158,13 +146,6 @@ fclose(fp);
   correr contigo na maquina virtual
   */
 
-  /*links que me ajudaram
-  https://stackoverflow.com/questions/21721808/how-to-fread-structs
-  https://stackoverflow.com/questions/37779302/fread-into-struct-reads-data-incorrectly
-  https://stackoverflow.com/questions/16075233/reading-and-processing-wav-file-data-in-c-c
-  https://stackoverflow.com/questions/61834780/reading-binary-file-and-storing-it-to-struct-in-c?noredirect=1&lq=1
-  https://stackoverflow.com/questions/21721808/how-to-fread-structs
-  */
   return 0;
 }
 
