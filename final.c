@@ -112,15 +112,29 @@ int showTray(bool override) {
 int showCompleteBatch() {
 
   FILE * fp = fopen("warehouse.dat", "rb+");
-  SLOT slot;
+  SLOT slotExample[9][9][4];
   if (fp == NULL) {
     printf("Error opening text file\n");
     exit(1);
   }
 
-	while(fread(&slot, sizeof(SLOT), 1, fp)){
-		le_slot(&slot);
+
+//será que é assim que se le o armazem??
+for(int i = 0; i<=4;i++){
+  for(int j = 0;j<=9;j++){
+    for(int k = 0;k<=9;k++){
+	  fread(&slotExample[i][j][k], sizeof(SLOT), 1, fp);
+		le_slot(&slotExample[i][j][k]);
+  
+    }
   }
+}
+
+/*
+	while(fread(&slotExample[9][9][4], sizeof(SLOT), 1, fp)){
+		le_slot(&slotExample[9][9][4]);
+  }
+*/
 
   fclose(fp);
   /*
