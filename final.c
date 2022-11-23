@@ -63,7 +63,7 @@ int showTray(bool override) {
   int testingVar;
   FILE * fp;
   char str[60];
-  int i = 1;
+  int i = 0;
 
   if (override == FALSE) {
     getchar(); // Para apanhar o [enter]
@@ -104,35 +104,8 @@ int showTray(bool override) {
 
 }
 //-----------------------------------------------------------------------------------------------------------
-/*
-void reading(){
-  FILE * fp = fopen("warehouse.dat", "rb");
 
-  if (fp == NULL) {
-    printf("Error opening text file\n");
-    exit(1);
-  }
-  LOTE * buff = malloc(sizeof(LOTE));
-  size_t varTest;
 
-    fread(&buff->id, sizeof(buff->id), 1, fp);
-    fread(&buff->destiny, sizeof(buff->destiny), 1, fp);
-    fread(&buff->date, sizeof(buff->date), 1, fp);
-    fread(&buff->quantity, sizeof(buff->quantity), 1, fp);
-    fread(&buff->type, sizeof(buff->type), 1, fp);
-    printf("%u %s %s %u %u\n", buff->id, buff->destiny, buff->date, buff->quantity, buff->type);
-
-  free(buff); /* free whatever you allocated after finished using them */
-
-  fclose(fp);
-
-}
-
-    ( * ptr).destiny,
-    ( * ptr).date,
-    ( * ptr).quantity,
-    ( * ptr).type
-*/
 
 int showCompleteBatch() {
   FILE * fp = fopen("warehouse.dat", "rb");
@@ -229,7 +202,7 @@ void choices() {
     case '2':
       break;
     case '3':
-      while(1){reading();}
+      showCompleteBatch();
       showMenu();
       break;
     case '4':
@@ -260,3 +233,86 @@ int main(int argc, char * argv[]) {
   showMenu();
   choices();
 }
+
+
+    //https://www.geeksforgeeks.org/how-to-avoid-structure-padding-in-c/
+     //https://www.geeksforgeeks.org/structure-member-alignment-padding-and-data-packing/
+     //https://www.javatpoint.com/structure-padding-in-c
+     //https://www.educba.com/structure-padding-in-c/
+
+/*
+void reading(){
+  FILE * fp = fopen("warehouse.dat", "rb");
+
+  if (fp == NULL) {
+    printf("Error opening text file\n");
+    exit(1);
+  }
+
+  LOTE * buff = malloc(sizeof(LOTE));
+
+  while (1) {
+    fread(&buff, sizeof(buff), 1, fp);
+    if(feof(fp)) {
+      break;
+    }
+
+    printf("\nid: %u", buff->id);
+    printf("\ndestiny: %s", buff->destiny);
+    printf("\ndate: %s", buff->date);
+    printf("\nquantity: %u", buff->quantity);
+    printf("\ntype: %u", buff->type);
+    printf("\n");
+  }
+  printf("\nFinished\n");
+
+  free(buff); 
+
+  fclose(fp);
+
+}
+*/
+/*
+  while (1) {
+    fread(&book, sizeof(book), 1, fp);
+    if(feof(fp)) {
+      break;
+    }
+
+    printf("\nTitle: %s", book.title);
+    printf("\nAuthor: %s", book.author);
+    printf("\nPublisher: %s", book.publisher);
+    printf("\nPrice: %.2f", book.price);
+    printf("\n");
+  }
+  printf("\nFinished\n");
+
+  fclose(fp);
+  return 0;
+}
+*/
+
+/*
+void reading(){
+  FILE * fp = fopen("warehouse.dat", "rb");
+
+  if (fp == NULL) {
+    printf("Error opening text file\n");
+    exit(1);
+  }
+  LOTE * buff = malloc(sizeof(LOTE));
+  size_t varTest;
+
+    fread(&buff->id, sizeof(buff->id), 1, fp);
+    fread(&buff->destiny, sizeof(buff->destiny), 1, fp);
+    fread(&buff->date, sizeof(buff->date), 1, fp);
+    fread(&buff->quantity, sizeof(buff->quantity), 1, fp);
+    fread(&buff->type, sizeof(buff->type), 1, fp);
+    printf("%u %s %s %u %u\n", buff->id, buff->destiny, buff->date, buff->quantity, buff->type);
+
+  //free(buff); free whatever you allocated after finished using them 
+
+  //fclose(fp);
+
+//}
+*/
