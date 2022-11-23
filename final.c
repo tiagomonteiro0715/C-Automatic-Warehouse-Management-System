@@ -104,6 +104,35 @@ int showTray(bool override) {
 
 }
 //-----------------------------------------------------------------------------------------------------------
+/*
+void reading(){
+  FILE * fp = fopen("warehouse.dat", "rb");
+
+  if (fp == NULL) {
+    printf("Error opening text file\n");
+    exit(1);
+  }
+  LOTE * buff = malloc(sizeof(LOTE));
+  size_t varTest;
+
+    fread(&buff->id, sizeof(buff->id), 1, fp);
+    fread(&buff->destiny, sizeof(buff->destiny), 1, fp);
+    fread(&buff->date, sizeof(buff->date), 1, fp);
+    fread(&buff->quantity, sizeof(buff->quantity), 1, fp);
+    fread(&buff->type, sizeof(buff->type), 1, fp);
+    printf("%u %s %s %u %u\n", buff->id, buff->destiny, buff->date, buff->quantity, buff->type);
+
+  free(buff); /* free whatever you allocated after finished using them */
+
+  fclose(fp);
+
+}
+
+    ( * ptr).destiny,
+    ( * ptr).date,
+    ( * ptr).quantity,
+    ( * ptr).type
+*/
 
 int showCompleteBatch() {
   FILE * fp = fopen("warehouse.dat", "rb");
@@ -127,6 +156,7 @@ int showCompleteBatch() {
   }
   free(buff);
 
+fclose(fp);
   /*
   fread binary file c
  tipo 1 - C - cartoes
@@ -199,7 +229,7 @@ void choices() {
     case '2':
       break;
     case '3':
-      showCompleteBatch();
+      while(1){reading();}
       showMenu();
       break;
     case '4':
