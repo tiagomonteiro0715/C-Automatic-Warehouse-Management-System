@@ -24,6 +24,7 @@ typedef struct lote {
 }
 LOTE;
 
+//static const LOTE loteVazio; //usamos static para iniciar todos os valores. Bem bom. Assim não os tenho que preenher - https://stackoverflow.com/questions/10927274/gcc-uninitialized-global-variables/10927409#10927409
 
 /*
 typedef struct prateleira {
@@ -33,6 +34,7 @@ typedef struct prateleira {
 PRATELEIRA;
 */
 
+/*
 void le_lote(LOTE * ptr) {
   printf("\n\n===Conteudos lote===\n id: %u\n destiny:%s\n date:%s\n quantity:%u\n type:%u\n\n",
     ( * ptr).id,
@@ -42,7 +44,17 @@ void le_lote(LOTE * ptr) {
     ( * ptr).type
   );
 }
+*/
 
+void le_lote(LOTE * ptr) {
+  printf("\n\n id: %u destiny:%s date:%s quantity:%u type:%u\n",
+    ( * ptr).id,
+    ( * ptr).destiny,
+    ( * ptr).date,
+    ( * ptr).quantity,
+    ( * ptr).type
+  );
+}
 LOTE exemploLote;
 //-----------------------------------------------------------------------------------------------------------
 
@@ -102,10 +114,16 @@ int showCompleteBatch() {
   }
 
   size_t varTest;
-  int count;
+  char * size = " "; 
+  char * enter = "\n";
+  //&& varTest != (fread(buff, sizeof(LOTE), 1, fp) == *size)
   LOTE * buff = malloc(sizeof(LOTE));
-  while ((varTest = fread(buff, sizeof(LOTE), 1, fp)) > 0) {
-    le_lote(buff);
+  while ((varTest = fread(buff, sizeof(LOTE), 1, fp)) > 0 ) {
+    if(varTest != *size || varTest != *enter){
+      le_lote(buff); 
+    }
+    
+
   }
   free(buff);
 
