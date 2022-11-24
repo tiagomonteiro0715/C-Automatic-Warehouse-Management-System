@@ -36,18 +36,16 @@ SLOT;
  *******  Declaração de funções de leitura de estruturas  *******
  ****************************************************************/
 void le_lote_pedido(SLOT * ptr, int expectedUserInputId) {
-  if(expectedUserInputId == ( * ptr).lote.id){
-  printf("\n\n=== Produto ===\n Id: %u\n Destination:%s\n Quantity:%u\n Type:%u\n Exp. Date:%s\n\n",
-    ( * ptr).lote.id,
-    ( * ptr).lote.destiny,
-    ( * ptr).lote.quantity,
-    ( * ptr).lote.type,
-    ( * ptr).lote.date
-  );
+  if (expectedUserInputId == ( * ptr).lote.id) {
+    printf("\n\n=== Produto ===\n Id: %u\n Destination:%s\n Quantity:%u\n Type:%u\n Exp. Date:%s\n\n",
+      ( * ptr).lote.id,
+      ( * ptr).lote.destiny,
+      ( * ptr).lote.quantity,
+      ( * ptr).lote.type,
+      ( * ptr).lote.date
+    );
   }
 }
-
- 
 
 void le_lote_completo(SLOT * ptr) {
   printf("\n\n id: %u destiny:%s date:%s quantity:%u type:%u",
@@ -58,7 +56,6 @@ void le_lote_completo(SLOT * ptr) {
     ( * ptr).lote.type
   );
 }
-
 
 void le_slot_pedido(SLOT * ptr, int expectedUserInputId) {
   le_lote_pedido(ptr, expectedUserInputId);
@@ -74,13 +71,13 @@ void le_slot_completo(SLOT * ptr) {
  ***********************  Funções  *******************************
  ****************************************************************/
 void convertNumToType(char * saveCharVar, int inputInt, bool fullText) {
-  if(fullText == FALSE){
-  if (inputInt == 1) {
-    strcpy(saveCharVar, "C");
-  }
-  if (inputInt == 2) {
-    strcpy(saveCharVar, "L");
-  }
+  if (fullText == FALSE) {
+    if (inputInt == 1) {
+      strcpy(saveCharVar, "C");
+    }
+    if (inputInt == 2) {
+      strcpy(saveCharVar, "L");
+    }
   }
 
 }
@@ -162,13 +159,13 @@ int showCompleteBatch() {
   return 0;
 }
 
-int batchInfo(){
+int batchInfo() {
   FILE * fp = fopen("warehouse.dat", "rb+");
   SLOT slotExample;
   int userInputId;
 
   printf("ID: ");
-  scanf("%d", &userInputId);
+  scanf("%d", & userInputId);
   getchar();
 
   if (fp == NULL) {
@@ -176,14 +173,17 @@ int batchInfo(){
     exit(1);
   }
 
-  while(fread(&slotExample, sizeof(SLOT), 1, fp)){
-  		le_slot_pedido(&slotExample, userInputId);
-    }
-  
+  while (fread( & slotExample, sizeof(SLOT), 1, fp)) {
+    le_slot_pedido( & slotExample, userInputId);
+  }
 
   return 0;
 }
 
+int warehouseOccupancy() {
+
+  return 0;
+}
 void showMenu() {
 
   printf("\n\n1 - Show tray\n");
@@ -229,6 +229,8 @@ void choices() {
       showMenu();
       break;
     case '4':
+      warehouseOccupancy();
+      showMenu();
       break;
     case '5':
       break;
