@@ -34,7 +34,7 @@ typedef struct slot {
 
 /*
 void le_lote(LOTE * ptr) {
-  printf("\n\n===Conteudos lote===\n id: %u\n destiny:%s\n date:%s\n quantity:%u\n type:%u\n\n",
+  printf("\n\n=== Produto ===\n id: %u\n destiny:%s\n date:%s\n quantity:%u\n type:%u\n\n",
     ( * ptr).id,
     ( * ptr).destiny,
     ( * ptr).date,
@@ -54,12 +54,10 @@ void le_lote(SLOT * ptr) {
   );
 }
 
-
 void le_slot(SLOT * ptr) {
   le_lote(ptr);
-  printf(" flag:%u\n",
+  printf(" flag:%u \n",
     ( * ptr).flag
-
   );
 }
 /****************************************************************
@@ -127,52 +125,30 @@ int showTray(bool override) {
 int showCompleteBatch() {
 
   FILE * fp = fopen("warehouse.dat", "rb+");
-  SLOT slotExample[9][9][4];
+  SLOT slotExample[4][9][9];
   if (fp == NULL) {
     printf("Error opening text file\n");
     exit(1);
   }
 
 
-for(int i = 0; i<=4;i++){
-  for(int j = 0;j<=9;j++){
-    for(int k = 0;k<=9;k++){
-	  fread(&slotExample[i][j][k], sizeof(SLOT), 1, fp);
-		le_slot(&slotExample[i][j][k]);
-  
+for(int z = 0; z<=4;z++){
+  for(int y = 0;y<=9;y++){
+    for(int x = 0;x<=9;x++){
+	  fread(&slotExample[z][y][x], sizeof(SLOT), 1, fp);
+		le_slot(&slotExample[z][y][x]);
+
     }
   }
 }
-/*
 
+/*
 while(fread(&slotExample[9][9][4], sizeof(SLOT), 1, fp)){
 		le_slot(&slotExample[9][9][4]);
   }
 */
 
   fclose(fp);
-  /*
-  fread binary file c
- tipo 1 - C - cartoes
- tipo 2 - L - livretes
-
- por isto bem na funç~ao showtray.txt
- 
- conctagenar ambos com _ e funç~ao de convers~ao de numero para letra. usar strcpy
-  */
-
-  /*
-  fazer fwrite para um ficheiro texto para usar fscanf e para ver se está a ler bem o ficheiro
-  https://www.tutorialspoint.com/c_standard_library/c_function_fwrite.htm
-
-  senão tenho que mandar email ao professor
-
-  posso fazer isso??
-
-  pela linha de comandos está a haver problemas
-
-  correr contigo na maquina virtual
-  */
 
   return 0;
 }
