@@ -223,6 +223,7 @@ int warehouseOccupancy() {
 void showMenu() {
 
   printf("\n\n1 - Show tray\n");
+  
   printf("2 - Show batch info\n");
   printf("3 - List batches\n");
   printf("4 - Show wharehouse occupancy\n");
