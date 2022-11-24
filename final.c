@@ -67,6 +67,15 @@ void le_slot_completo(SLOT * ptr) {
     ( * ptr).flag
   );
 }
+
+void checkOccupancy(SLOT * ptr, char * inputFlagState) {
+if(( * ptr).flag == 0){
+  strcpy(inputFlagState, ".");
+}
+if(( * ptr).flag == 1){
+  strcpy(inputFlagState, "X");
+}
+}
 /****************************************************************
  ***********************  Funções  *******************************
  ****************************************************************/
@@ -181,6 +190,36 @@ int batchInfo() {
 }
 
 int warehouseOccupancy() {
+  FILE * fp = fopen("warehouse.dat", "rb+");
+  SLOT slotExample;
+  char input;
+  int userInputShelf;
+  int countLine= 1;
+  int printCurrentLine = 0;
+  printf("Shelf: ");
+  scanf("%d", & userInputShelf);
+  getchar();
+
+  if (fp == NULL) {
+    printf("Error opening binary file\n");
+    exit(1);
+  }
+
+  printf("\n\n -----WAREHOUSE-----\n");
+  printf(" 0 1 2 3 4 5 6 7 8 9\n");
+  while (fread( & slotExample, sizeof(SLOT), 1, fp)) {
+    if (!(countLine%9)){
+      printCurrentLine += 1;
+      printf("%d\n", printCurrentLine);
+    }
+    checkOccupancy(&slotExample, &input);
+    printf("%c ", input);
+
+    countLine += 1;
+  }
+
+
+
 
   return 0;
 }
