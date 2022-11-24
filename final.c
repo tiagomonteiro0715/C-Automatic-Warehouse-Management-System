@@ -32,22 +32,24 @@ typedef struct slot {
   unsigned int flag; //0 - livre || 1 - ocupado
 }
 SLOT;
-
-/*
-void le_lote(LOTE * ptr) {
-  printf("\n\n=== Produto ===\n id: %u\n destiny:%s\n date:%s\n quantity:%u\n type:%u\n\n",
-    ( * ptr).id,
-    ( * ptr).destiny,
-    ( * ptr).date,
-    ( * ptr).quantity,
-    ( * ptr).type
-  );
-}
-*/
 /****************************************************************
  *******  Declaração de funções de leitura de estruturas  *******
  ****************************************************************/
-void le_lote(SLOT * ptr) {
+void le_lote_pedido(SLOT * ptr, int expectedUserInputId) {
+  if(expectedUserInputId == ( * ptr).lote.id){
+  printf("\n\n=== Produto ===\n Id: %u\n Destination:%s\n Quantity:%u\n Type:%u\n Exp. Date:%s\n\n",
+    ( * ptr).lote.id,
+    ( * ptr).lote.destiny,
+    ( * ptr).lote.quantity,
+    ( * ptr).lote.type,
+    ( * ptr).lote.date
+  );
+  }
+}
+
+ 
+
+void le_lote_completo(SLOT * ptr) {
   printf("\n\n id: %u destiny:%s date:%s quantity:%u type:%u",
     ( * ptr).lote.id,
     ( * ptr).lote.destiny,
@@ -57,8 +59,13 @@ void le_lote(SLOT * ptr) {
   );
 }
 
-void le_slot(SLOT * ptr) {
-  le_lote(ptr);
+
+void le_slot_pedido(SLOT * ptr, int expectedUserInputId) {
+  le_lote_pedido(ptr, expectedUserInputId);
+}
+
+void le_slot_completo(SLOT * ptr) {
+  le_lote_completo(ptr);
   printf(" flag:%u \n",
     ( * ptr).flag
   );
@@ -66,13 +73,16 @@ void le_slot(SLOT * ptr) {
 /****************************************************************
  ***********************  Funções  *******************************
  ****************************************************************/
-void convertNumToType(char * saveCharVar, int inputInt) {
+void convertNumToType(char * saveCharVar, int inputInt, bool fullText) {
+  if(fullText == FALSE){
   if (inputInt == 1) {
     strcpy(saveCharVar, "C");
   }
   if (inputInt == 2) {
     strcpy(saveCharVar, "L");
   }
+  }
+
 }
 
 int showTray(bool override) {
@@ -110,7 +120,7 @@ int showTray(bool override) {
       printf("\n");
     }
 
-    convertNumToType( & typeVarChar, typeVarInt);
+    convertNumToType( & typeVarChar, typeVarInt, FALSE);
     printf(" %d_%c ", inputVar, typeVarChar);
 
     countLoop += 1;
@@ -127,7 +137,7 @@ int showCompleteBatch() {
   FILE * fp = fopen("warehouse.dat", "rb+");
   SLOT slotExample[4][9][9];
   if (fp == NULL) {
-    printf("Error opening text file\n");
+    printf("Error opening binary file\n");
     exit(1);
   }
 
@@ -135,7 +145,7 @@ int showCompleteBatch() {
     for (int y = 0; y <= 9; y++) {
       for (int x = 0; x <= 9; x++) {
         fread( & slotExample[z][y][x], sizeof(SLOT), 1, fp);
-        le_slot( & slotExample[z][y][x]);
+        le_slot_completo( & slotExample[z][y][x]);
 
       }
     }
@@ -143,11 +153,33 @@ int showCompleteBatch() {
 
   /*
   while(fread(&slotExample[9][9][4], sizeof(SLOT), 1, fp)){
-  		le_slot(&slotExample[9][9][4]);
+  		le_slot_completo(&slotExample[9][9][4]);
     }
   */
 
   fclose(fp);
+
+  return 0;
+}
+
+int batchInfo(){
+  FILE * fp = fopen("warehouse.dat", "rb+");
+  SLOT slotExample;
+  int userInputId;
+
+  printf("ID: ");
+  scanf("%d", &userInputId);
+  getchar();
+
+  if (fp == NULL) {
+    printf("Error opening binary file\n");
+    exit(1);
+  }
+
+  while(fread(&slotExample, sizeof(SLOT), 1, fp)){
+  		le_slot_pedido(&slotExample, userInputId);
+    }
+  
 
   return 0;
 }
@@ -189,6 +221,8 @@ void choices() {
       showMenu();
       break;
     case '2':
+      batchInfo();
+      showMenu();
       break;
     case '3':
       showCompleteBatch();
