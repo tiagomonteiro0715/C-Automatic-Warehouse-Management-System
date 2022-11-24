@@ -65,31 +65,34 @@ void le_slot(SLOT * ptr) {
 /****************************************************************
 ***********************  Funções  *******************************
 ****************************************************************/
-void convertNumToType(char saveCharVar[1], int inputInt){
-  if(inputInt == 0){
-    strcpy(saveCharVar, "_C");
-  }
+void convertNumToType(char *saveCharVar, int inputInt){
   if(inputInt == 1){
-    strcpy(saveCharVar, "_L");
+    strcpy(saveCharVar, "C");
+  }
+   if(inputInt == 2){
+    strcpy(saveCharVar, "L");
   }
 }
 
 int showTray(bool override) {
-  char inputTray[100];
-  int inputVar;
   FILE * fp;
-  char str[60];
-  int count = 0;
-  int c;
-  int typeVar;
-  char finalStr[15];
+  char inputTrayName[100];
+  char strToReadInput[60];
+  int countLoop = 0;
 
+  int inputVar;
+  char destinyVar[MAX_DESTINY_STR];
+  char dateVar[MAX_DATE_STR];
+  int quantityVar;
+
+  int typeVarInt;
+  char typeVarChar;
   if (override == FALSE) {
     getchar(); // Para apanhar o [enter]
     printf("Filename: ");
-    scanf("%s", inputTray);
+    scanf("%s", inputTrayName);
     printf("\n");
-    fp = fopen(inputTray, "r");
+    fp = fopen(inputTrayName, "r");
   } else {
     fp = fopen("tray.txt", "r");
   }
@@ -99,30 +102,19 @@ int showTray(bool override) {
     exit(1);
   }
 
-  while (fgets(str, sizeof(str), fp)) {
-    fscanf(fp, "%d", &inputVar);// fscanf(fp, "%d %d", &inputVar, &typeVar);
-/*
-ve typeVar, com convertNumToType() muda e assim numa string base finalStr[15] adicionar o input. 
-*/
-    if (!(count % 4)) {
+  while (fgets(strToReadInput, sizeof(strToReadInput), fp)) {
+    fscanf(fp, "%d %s %s %d %d", &inputVar, destinyVar, dateVar, &quantityVar, &typeVarInt);// fscanf(fp, "%d %d", &inputVar, &typeVar);
+    
+    if (!(countLoop % 4)) {
       printf("\n");
     }
-    c = inputVar + '0';
 
-    printf("%d ", inputVar);
+    convertNumToType(&typeVarChar, typeVarInt);
+    printf(" %d_%c ", inputVar, typeVarChar);
 
-    count += 1;
+    countLoop += 1;
   }
 
-  //tentativa de ler ficheiro warehouse.dat
-  /*
-    char buffer[10];
-     while (feof(fp) != EOF) // to read file
-      {
-        fread(buffer, sizeof(char), 1, fp);
-        printf("\n%s", buffer);
-     }
-  */
 
   fclose(fp);
   return 0;
@@ -142,7 +134,6 @@ int showCompleteBatch() {
   }
 
 
-/*será que é assim que se le o armazem??
 for(int i = 0; i<=4;i++){
   for(int j = 0;j<=9;j++){
     for(int k = 0;k<=9;k++){
@@ -152,13 +143,12 @@ for(int i = 0; i<=4;i++){
     }
   }
 }
-*/
+/*
 
-
-	while(fread(&slotExample[9][9][4], sizeof(SLOT), 1, fp)){
+while(fread(&slotExample[9][9][4], sizeof(SLOT), 1, fp)){
 		le_slot(&slotExample[9][9][4]);
   }
-
+*/
 
   fclose(fp);
   /*
