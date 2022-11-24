@@ -17,20 +17,21 @@
 #define LATERAL_SIZE 9
 
 /****************************************************************
-*****************  Declaração de estruturas  ********************
-****************************************************************/
+ *****************  Declaração de estruturas  ********************
+ ****************************************************************/
 struct loteCompleto {
-  unsigned int id;//4 bytes
-  char destiny[MAX_DESTINY_STR];//30 bytes
-  char date[MAX_DATE_STR];//12 bytes
-  unsigned int quantity;//4 bytes
-  unsigned int type;//4 bytes
+  unsigned int id; //4 bytes
+  char destiny[MAX_DESTINY_STR]; //30 bytes
+  char date[MAX_DATE_STR]; //12 bytes
+  unsigned int quantity; //4 bytes
+  unsigned int type; //4 bytes
 };
 
 typedef struct slot {
   struct loteCompleto lote;
-  unsigned int flag;//0 - livre || 1 - ocupado
-}SLOT;
+  unsigned int flag; //0 - livre || 1 - ocupado
+}
+SLOT;
 
 /*
 void le_lote(LOTE * ptr) {
@@ -43,7 +44,9 @@ void le_lote(LOTE * ptr) {
   );
 }
 */
-
+/****************************************************************
+ *******  Declaração de funções de leitura de estruturas  *******
+ ****************************************************************/
 void le_lote(SLOT * ptr) {
   printf("\n\n id: %u destiny:%s date:%s quantity:%u type:%u",
     ( * ptr).lote.id,
@@ -61,13 +64,13 @@ void le_slot(SLOT * ptr) {
   );
 }
 /****************************************************************
-***********************  Funções  *******************************
-****************************************************************/
-void convertNumToType(char *saveCharVar, int inputInt){
-  if(inputInt == 1){
+ ***********************  Funções  *******************************
+ ****************************************************************/
+void convertNumToType(char * saveCharVar, int inputInt) {
+  if (inputInt == 1) {
     strcpy(saveCharVar, "C");
   }
-   if(inputInt == 2){
+  if (inputInt == 2) {
     strcpy(saveCharVar, "L");
   }
 }
@@ -101,26 +104,23 @@ int showTray(bool override) {
   }
 
   while (fgets(strToReadInput, sizeof(strToReadInput), fp)) {
-    fscanf(fp, "%d %s %s %d %d", &inputVar, destinyVar, dateVar, &quantityVar, &typeVarInt);// fscanf(fp, "%d %d", &inputVar, &typeVar);
-    
+    fscanf(fp, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); // fscanf(fp, "%d %d", &inputVar, &typeVar);
+
     if (!(countLoop % 4)) {
       printf("\n");
     }
 
-    convertNumToType(&typeVarChar, typeVarInt);
+    convertNumToType( & typeVarChar, typeVarInt);
     printf(" %d_%c ", inputVar, typeVarChar);
 
     countLoop += 1;
   }
-
 
   fclose(fp);
   return 0;
 
 }
 //-----------------------------------------------------------------------------------------------------------
-
-
 
 int showCompleteBatch() {
 
@@ -131,22 +131,21 @@ int showCompleteBatch() {
     exit(1);
   }
 
+  for (int z = 0; z <= 4; z++) {
+    for (int y = 0; y <= 9; y++) {
+      for (int x = 0; x <= 9; x++) {
+        fread( & slotExample[z][y][x], sizeof(SLOT), 1, fp);
+        le_slot( & slotExample[z][y][x]);
 
-for(int z = 0; z<=4;z++){
-  for(int y = 0;y<=9;y++){
-    for(int x = 0;x<=9;x++){
-	  fread(&slotExample[z][y][x], sizeof(SLOT), 1, fp);
-		le_slot(&slotExample[z][y][x]);
-
+      }
     }
   }
-}
 
-/*
-while(fread(&slotExample[9][9][4], sizeof(SLOT), 1, fp)){
-		le_slot(&slotExample[9][9][4]);
-  }
-*/
+  /*
+  while(fread(&slotExample[9][9][4], sizeof(SLOT), 1, fp)){
+  		le_slot(&slotExample[9][9][4]);
+    }
+  */
 
   fclose(fp);
 
@@ -223,86 +222,3 @@ int main(int argc, char * argv[]) {
   showMenu();
   choices();
 }
-
-
-    //https://www.geeksforgeeks.org/how-to-avoid-structure-padding-in-c/
-     //https://www.geeksforgeeks.org/structure-member-alignment-padding-and-data-packing/
-     //https://www.javatpoint.com/structure-padding-in-c
-     //https://www.educba.com/structure-padding-in-c/
-
-/*
-void reading(){
-  FILE * fp = fopen("warehouse.dat", "rb");
-
-  if (fp == NULL) {
-    printf("Error opening text file\n");
-    exit(1);
-  }
-
-  LOTE * buff = malloc(sizeof(LOTE));
-
-  while (1) {
-    fread(&buff, sizeof(buff), 1, fp);
-    if(feof(fp)) {
-      break;
-    }
-
-    printf("\nid: %u", buff->id);
-    printf("\ndestiny: %s", buff->destiny);
-    printf("\ndate: %s", buff->date);
-    printf("\nquantity: %u", buff->quantity);
-    printf("\ntype: %u", buff->type);
-    printf("\n");
-  }
-  printf("\nFinished\n");
-
-  free(buff); 
-
-  fclose(fp);
-
-}
-*/
-/*
-  while (1) {
-    fread(&book, sizeof(book), 1, fp);
-    if(feof(fp)) {
-      break;
-    }
-
-    printf("\nTitle: %s", book.title);
-    printf("\nAuthor: %s", book.author);
-    printf("\nPublisher: %s", book.publisher);
-    printf("\nPrice: %.2f", book.price);
-    printf("\n");
-  }
-  printf("\nFinished\n");
-
-  fclose(fp);
-  return 0;
-}
-*/
-
-/*
-void reading(){
-  FILE * fp = fopen("warehouse.dat", "rb");
-
-  if (fp == NULL) {
-    printf("Error opening text file\n");
-    exit(1);
-  }
-  LOTE * buff = malloc(sizeof(LOTE));
-  size_t varTest;
-
-    fread(&buff->id, sizeof(buff->id), 1, fp);
-    fread(&buff->destiny, sizeof(buff->destiny), 1, fp);
-    fread(&buff->date, sizeof(buff->date), 1, fp);
-    fread(&buff->quantity, sizeof(buff->quantity), 1, fp);
-    fread(&buff->type, sizeof(buff->type), 1, fp);
-    printf("%u %s %s %u %u\n", buff->id, buff->destiny, buff->date, buff->quantity, buff->type);
-
-  //free(buff); free whatever you allocated after finished using them 
-
-  //fclose(fp);
-
-//}
-*/
