@@ -68,12 +68,24 @@ void le_slot_completo(SLOT * ptr) {
   );
 }
 
-void checkOccupancy(SLOT * ptr, char * inputFlagState) {
-  if (( * ptr).flag == 0) {
-    strcpy(inputFlagState, ".");
+int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
+  if (giveBoolVal == FALSE) {
+    if (( * ptr).flag == 0) {
+      strcpy(inputFlagState, ".");
+    }
+    if (( * ptr).flag == 1) {
+      strcpy(inputFlagState, "X");
+    }
   }
-  if (( * ptr).flag == 1) {
-    strcpy(inputFlagState, "X");
+
+  if (giveBoolVal == TRUE) {
+    if (( * ptr).flag == 0) {
+      return FALSE;
+    }
+    if (( * ptr).flag == 1) {
+      return TRUE;
+    }
+
   }
 }
 /****************************************************************
@@ -212,7 +224,7 @@ int warehouseOccupancy() {
       printCurrentLine += 1;
       printf("%d\n", printCurrentLine);
     }
-    checkOccupancy( & slotExample, & input);
+    checkOccupancy( & slotExample, & input, FALSE);
     printf("%c ", input);
 
     countLine += 1;
@@ -220,10 +232,46 @@ int warehouseOccupancy() {
 
   return 0;
 }
+
+int storeTray() {
+  //checkOccupancy( & slotExample, & input, TRUE);
+
+  FILE * fp;
+  char inputTrayName[100];
+  char strToReadInput[60];
+  int countLoop = 0;
+
+  int inputVar;
+  char destinyVar[MAX_DESTINY_STR];
+  char dateVar[MAX_DATE_STR];
+  int quantityVar;
+
+  int typeVarInt;
+
+  getchar(); // Para apanhar o [enter]
+  printf("Tray Filename: ");
+  scanf("%s", inputTrayName);
+  printf("\n");
+  fp = fopen(inputTrayName, "r");
+
+  if (fp == NULL) { //d´a NULL porque n~ao est´a a apontar para nada
+    printf("Error opening text file\n");
+    exit(1);
+  }
+
+  while (fgets(strToReadInput, sizeof(strToReadInput), fp)) {
+    fscanf(fp, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); // fscanf(fp, "%d %d", &inputVar, &typeVar);
+  }
+
+  fclose(fp);
+  return 0;
+
+  return 0;
+}
 void showMenu() {
 
   printf("\n\n1 - Show tray\n");
-  
+
   printf("2 - Show batch info\n");
   printf("3 - List batches\n");
   printf("4 - Show wharehouse occupancy\n");
@@ -270,6 +318,8 @@ void choices() {
       showMenu();
       break;
     case '5':
+      storeTray();
+      showMenu();
       break;
     case '6':
       break;
