@@ -17,19 +17,19 @@
 #define LATERAL_SIZE 9
 
 /****************************************************************
- *****************  Declaração de estruturas  ********************
+ *****************  Declaração de estruturas  *******************
  ****************************************************************/
 struct loteCompleto {
-  unsigned int id; //4 bytes
+  int id; //4 bytes
   char destiny[MAX_DESTINY_STR]; //30 bytes
   char date[MAX_DATE_STR]; //12 bytes
-  unsigned int quantity; //4 bytes
-  unsigned int type; //4 bytes
+  int quantity; //4 bytes
+  int type; //4 bytes
 };
 
 typedef struct slot {
   struct loteCompleto lote;
-  unsigned int flag; //0 - livre || 1 - ocupado
+  int flag; //0 - livre || 1 - ocupado
 }
 SLOT;
 /****************************************************************
@@ -37,7 +37,7 @@ SLOT;
  ****************************************************************/
 void le_lote_pedido(SLOT * ptr, int expectedUserInputId) {
   if (expectedUserInputId == ( * ptr).lote.id) {
-    printf("\n\n=== Produto ===\n Id: %u\n Destination:%s\n Quantity:%u\n Type:%u\n Exp. Date:%s\n\n",
+    printf("\n\n=== Produto ===\n Id: %d\n Destination:%s\n Quantity:%d\n Type:%d\n Exp. Date:%s\n\n",
       ( * ptr).lote.id,
       ( * ptr).lote.destiny,
       ( * ptr).lote.quantity,
@@ -48,7 +48,7 @@ void le_lote_pedido(SLOT * ptr, int expectedUserInputId) {
 }
 
 void le_lote_completo(SLOT * ptr) {
-  printf("\n\n id: %u destiny:%s date:%s quantity:%u type:%u",
+  printf("\n\n id: %d destiny:%s date:%s quantity:%d type:%d",
     ( * ptr).lote.id,
     ( * ptr).lote.destiny,
     ( * ptr).lote.date,
@@ -62,10 +62,14 @@ void le_slot_pedido(SLOT * ptr, int expectedUserInputId) {
 }
 
 void le_slot_completo(SLOT * ptr) {
-  le_lote_completo(ptr);
-  printf(" flag:%u \n",
+  if(( * ptr).flag == 1){
+   le_lote_completo(ptr);
+    printf(" flag:%d \n",
     ( * ptr).flag
-  );
+  ); 
+  }
+  
+
 }
 
 int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
@@ -87,6 +91,7 @@ int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
     }
 
   }
+  return 0;
 }
 /****************************************************************
  ***********************  Funções  *******************************
@@ -132,7 +137,7 @@ int showTray(bool override) {
   }
 
   while (fgets(strToReadInput, sizeof(strToReadInput), fp)) {
-    fscanf(fp, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); // fscanf(fp, "%d %d", &inputVar, &typeVar);
+    fscanf(fp, "%d %s %s %d %d", &inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); // fscanf(fp, "%d %d", &inputVar, &typeVar);
 
     if (!(countLoop % 4)) {
       printf("\n");
@@ -153,12 +158,13 @@ int showTray(bool override) {
 int showCompleteBatch() {
 
   FILE * fp = fopen("warehouse.dat", "rb+");
-  SLOT slotExample[4][9][9];
+  SLOT slotExample[5][10][10];
+  SLOT slotExampleOne;
   if (fp == NULL) {
     printf("Error opening binary file\n");
     exit(1);
   }
-
+/*
   for (int z = 0; z <= 4; z++) {
     for (int y = 0; y <= 9; y++) {
       for (int x = 0; x <= 9; x++) {
@@ -168,12 +174,12 @@ int showCompleteBatch() {
       }
     }
   }
-
-  /*
-  while(fread(&slotExample[9][9][4], sizeof(SLOT), 1, fp)){
-  		le_slot_completo(&slotExample[9][9][4]);
+*/
+  
+  while(fread(&slotExampleOne, sizeof(SLOT), 1, fp)){
+  		le_slot_completo(&slotExampleOne);
     }
-  */
+  
 
   fclose(fp);
 
@@ -197,6 +203,8 @@ int batchInfo() {
   while (fread( & slotExample, sizeof(SLOT), 1, fp)) {
     le_slot_pedido( & slotExample, userInputId);
   }
+  
+  fclose(fp);
 
   return 0;
 }
@@ -219,6 +227,7 @@ int warehouseOccupancy() {
 
   printf("\n\n -----WAREHOUSE-----\n");
   printf(" 0 1 2 3 4 5 6 7 8 9\n");
+  
   while (fread( & slotExample, sizeof(SLOT), 1, fp)) {
     if (!(countLine % 9)) {
       printCurrentLine += 1;
@@ -239,7 +248,6 @@ int storeTray() {
   FILE * fp;
   char inputTrayName[100];
   char strToReadInput[60];
-  int countLoop = 0;
 
   int inputVar;
   char destinyVar[MAX_DESTINY_STR];
@@ -274,11 +282,11 @@ void showMenu() {
 
   printf("2 - Show batch info\n");
   printf("3 - List batches\n");
-  printf("4 - Show wharehouse occupancy\n");
+  printf("4 - Show wharehouse occupancy\n\n");
 
   printf("5 - Store tray\n");
   printf("6 - Swap batch placement\n");
-  printf("7 - Show statistics\n");
+  printf("7 - Show statistics\n\n");
 
   printf("8 - Perform expedition\n");
 
