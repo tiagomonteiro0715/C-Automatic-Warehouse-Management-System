@@ -272,6 +272,7 @@ int showCompleteBatch() {
     countLine = countLine + 1;
     int Shelf = countLine / 100;
 
+    /* Printing the slot position and the shelf number in the warehouse */
     if ((slotExample.flag == 1)) {
       print_NumToSlotPosition(countLine);
       printf(" Shelf: %d", Shelf);
