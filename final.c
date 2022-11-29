@@ -5,6 +5,7 @@
 #include <string.h>
 
 
+/* Defining the constants that will be used in the program. */
 #define bool int
 #define TRUE 1
 #define FALSE 0
@@ -19,6 +20,14 @@
 /****************************************************************
  *****************  Declaração de estruturas  *******************
  ****************************************************************/
+/**
+ * A loteCompleto is a struct that contains an int, a char[], a char[], an int, and an int.
+ * @property {int} id - the id of the lote
+ * @property {char} destiny - The destiny of the lote.
+ * @property {char} date - "dd/mm/yyyy"
+ * @property {int} quantity - number of items in the lot
+ * @property {int} type - 0 =&gt; "Cereal"
+ */
 struct loteCompleto {
   int id; //4 bytes
   char destiny[MAX_DESTINY_STR]; //30 bytes
@@ -27,6 +36,13 @@ struct loteCompleto {
   int type; //4 bytes
 };
 
+/**
+ * A slot is a structure that contains a loteCompleto structure and an integer flag.
+ * @property lote - a struct that contains a loteCompleto, which is a struct that contains a lote,
+ * which is a struct that contains a loteSimples, which is a struct that contains a loteSimples, which
+ * is a struct that contains a loteSimples, which is a
+ * @property {int} flag - 0 - free || 1 - occupied
+ */
 typedef struct slot {
   struct loteCompleto lote;
   int flag; //0 - livre || 1 - ocupado
@@ -35,6 +51,12 @@ SLOT;
 /****************************************************************
  *******  Declaração de funções de leitura de estruturas  *******
  ****************************************************************/
+/**
+ * It prints the contents of a struct if the user input matches the struct's id
+ * 
+ * @param ptr pointer to the current slot
+ * @param expectedUserInputId The id that the user inputted
+ */
 void le_lote_pedido(SLOT * ptr, int expectedUserInputId) {
   if (expectedUserInputId == ( * ptr).lote.id) {
     printf("\n\n=== Produto ===\n Id: %d\n Destination:%s\n Quantity:%d\n Type:%d\n Exp. Date:%s\n\n",
@@ -47,6 +69,11 @@ void le_lote_pedido(SLOT * ptr, int expectedUserInputId) {
   }
 }
 
+/**
+ * It prints the contents of a SLOT structure
+ * 
+ * @param ptr pointer to the slot
+ */
 void le_lote_completo(SLOT * ptr) {
   printf("\n\n id: %d destiny:%s date:%s quantity:%d type:%d",
     ( * ptr).lote.id,
@@ -57,10 +84,21 @@ void le_lote_completo(SLOT * ptr) {
   );
 }
 
+/**
+ * It reads a lot of data from the user, and then it reads a lot of data from the user
+ * 
+ * @param ptr a pointer to a SLOT struct
+ * @param expectedUserInputId The expected user input id.
+ */
 void le_slot_pedido(SLOT * ptr, int expectedUserInputId) {
   le_lote_pedido(ptr, expectedUserInputId);
 }
 
+/**
+ * It reads a complete slot, if the flag is 1
+ * 
+ * @param ptr pointer to the slot
+ */
 void le_slot_completo(SLOT * ptr) {
   if(( * ptr).flag == 1){
    le_lote_completo(ptr);
@@ -68,10 +106,18 @@ void le_slot_completo(SLOT * ptr) {
     ( * ptr).flag
   ); 
   }
-  
-
 }
 
+/**
+ * It checks the occupancy of a slot and returns a boolean value or a string value depending on the
+ * value of the boolean parameter.
+ * 
+ * @param ptr pointer to the slot
+ * @param inputFlagState This is a char array that will be used to store the flag state of the slot.
+ * @param giveBoolVal TRUE or FALSE
+ * 
+ * @return the value of the flag variable.
+ */
 int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
   if (giveBoolVal == FALSE) {
     if (( * ptr).flag == 0) {
@@ -96,6 +142,16 @@ int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
 /****************************************************************
  ***********************  Funções  *******************************
  ****************************************************************/
+/**
+ * "If the inputInt is 1, then save the string "C" to the saveCharVar, otherwise if the inputInt is 2,
+ * then save the string "L" to the saveCharVar."
+ * 
+ * The above function is called in the following way:
+ * 
+ * @param saveCharVar The variable that will be saved to.
+ * @param inputInt The number that will be converted to a string.
+ * @param fullText TRUE or FALSE
+ */
 void convertNumToType(char * saveCharVar, int inputInt, bool fullText) {
   if (fullText == FALSE) {
     if (inputInt == 1) {
@@ -105,8 +161,16 @@ void convertNumToType(char * saveCharVar, int inputInt, bool fullText) {
       strcpy(saveCharVar, "L");
     }
   }
-
 }
+
+/**
+ * It reads a file and prints the contents of it
+ * 
+ * @param override if true, it will read from a file called "tray.txt"
+ * 
+ * @return the number of characters that were written to the file.
+ */
+//-----------------------------------------------------------------------------------------------------------
 
 int showTray(bool override) {
   FILE * fp;
@@ -155,6 +219,11 @@ int showTray(bool override) {
 }
 //-----------------------------------------------------------------------------------------------------------
 
+/**
+ * It reads the binary file and prints the content of the file
+ * 
+ * @return the number of slots that are complete.
+ */
 int showCompleteBatch() {
 
   FILE * fp = fopen("warehouse.dat", "rb+");
@@ -164,18 +233,6 @@ int showCompleteBatch() {
     printf("Error opening binary file\n");
     exit(1);
   }
-/*
-  for (int z = 0; z <= 4; z++) {
-    for (int y = 0; y <= 9; y++) {
-      for (int x = 0; x <= 9; x++) {
-        fread( & slotExample[z][y][x], sizeof(SLOT), 1, fp);
-        le_slot_completo( & slotExample[z][y][x]);
-
-      }
-    }
-  }
-*/
-  
   while(fread(&slotExampleOne, sizeof(SLOT), 1, fp)){
   		le_slot_completo(&slotExampleOne);
     }
@@ -186,6 +243,11 @@ int showCompleteBatch() {
   return 0;
 }
 
+/**
+ * It reads a binary file and prints the information of a specific ID
+ * 
+ * @return the value 0.
+ */
 int batchInfo() {
   FILE * fp = fopen("warehouse.dat", "rb+");
   SLOT slotExample;
@@ -209,6 +271,11 @@ int batchInfo() {
   return 0;
 }
 
+/**
+ * It reads the binary file, and prints out the contents of the file in a grid format
+ * 
+ * @return the number of slots that are occupied in the warehouse.
+ */
 int warehouseOccupancy() {
   FILE * fp = fopen("warehouse.dat", "rb+");
   SLOT slotExample;
@@ -276,6 +343,9 @@ int storeTray() {
 
   return 0;
 }
+/**
+ * It prints a menu
+ */
 void showMenu() {
 
   printf("\n\n1 - Show tray\n");
@@ -344,6 +414,13 @@ void choices() {
 
 }
 
+/**
+ * It takes a string as an argument, and if the string is equal to "tray.txt", it calls the showTray
+ * function with the argument TRUE
+ * 
+ * @param argc The number of arguments passed to the program.
+ * @param argv The argument vector.
+ */
 int main(int argc, char * argv[]) {
   if (argc == 2) {
     if (!(strcmp(argv[1], "tray.txt"))) {
