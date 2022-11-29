@@ -12,6 +12,7 @@
 
 #define MAX_DESTINY_STR 30
 #define MAX_DATE_STR 12
+#define MAX_TYPE_STR 10
 
 #define NUM_TABULEIRO 4
 #define NUM_PRATELEIRAS 4
@@ -51,6 +52,33 @@ SLOT;
 /****************************************************************
  *******  Declaração de funções de leitura de estruturas  *******
  ****************************************************************/
+
+/**
+ * It converts a number to a type of product.
+ * 
+ * @param saveCharVar The variable that will save the converted value.
+ * @param inputInt The number that will be converted to a string.
+ * @param fullText TRUE or FALSE
+ */
+void convertNumToType(char * saveCharVar, int inputInt, bool fullText) {
+  if (fullText == FALSE) {
+    if (inputInt == 1) {
+      strcpy(saveCharVar, "C");
+    }
+    if (inputInt == 2) {
+      strcpy(saveCharVar, "L");
+    }
+  }
+  if (fullText == TRUE) {
+    if (inputInt == 1) {
+      strcpy(saveCharVar, "Cartoes");
+    }
+    if (inputInt == 2) {
+      strcpy(saveCharVar, "Livretes");
+    }
+  }
+}
+
 /**
  * It prints the contents of a struct if the user input matches the struct's id
  * 
@@ -58,12 +86,16 @@ SLOT;
  * @param expectedUserInputId The id that the user inputted
  */
 void le_lote_pedido(SLOT * ptr, int expectedUserInputId) {
+  char ConvertedtypeName[MAX_TYPE_STR];
+
+  convertNumToType(ConvertedtypeName, ( * ptr).lote.type, TRUE);
+
   if ((expectedUserInputId == ( * ptr).lote.id) && (( * ptr).flag == 1)) {
-    printf("\n\n=== Produto ===\n Id: %d\n Destination:%s\n Quantity:%d\n Type:%d\n Exp. Date:%s\n\n",
+    printf("\n\n=== Produto ===\n Id: %d\n Destination:%s\n Quantity:%d\n Type:%s\n Exp. Date:%s\n\n",
       ( * ptr).lote.id,
       ( * ptr).lote.destiny,
       ( * ptr).lote.quantity,
-      ( * ptr).lote.type,
+      ConvertedtypeName,
       ( * ptr).lote.date
     );
   }
@@ -115,6 +147,7 @@ void le_slot_completo(SLOT * ptr) {
  * 
  * @return the value of the flag variable.
  */
+
 int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
   if (giveBoolVal == FALSE) {
     if (( * ptr).flag == 0) {
@@ -140,35 +173,12 @@ int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
  ***********************  Funções  *******************************
  ****************************************************************/
 /**
- * "If the inputInt is 1, then save the string "C" to the saveCharVar, otherwise if the inputInt is 2,
- * then save the string "L" to the saveCharVar."
- * 
- * The above function is called in the following way:
- * 
- * @param saveCharVar The variable that will be saved to.
- * @param inputInt The number that will be converted to a string.
- * @param fullText TRUE or FALSE
- */
-void convertNumToType(char * saveCharVar, int inputInt, bool fullText) {
-  if (fullText == FALSE) {
-    if (inputInt == 1) {
-      strcpy(saveCharVar, "C");
-    }
-    if (inputInt == 2) {
-      strcpy(saveCharVar, "L");
-    }
-  }
-}
-
-/**
  * It reads a file and prints the contents of it
  * 
  * @param override if true, it will read from a file called "tray.txt" directly from the command line
  * 
  * @return the number of characters that were written to the file.
  */
-//-----------------------------------------------------------------------------------------------------------
-
 int showTray(bool override) {
   FILE * fp;
   char inputTrayName[100];
@@ -305,7 +315,6 @@ int warehouseOccupancy() {
 }
 
 int storeTray() {
-  //checkOccupancy( & slotExample, & input, TRUE);
 
   FILE * fp;
   char inputTrayName[100];
