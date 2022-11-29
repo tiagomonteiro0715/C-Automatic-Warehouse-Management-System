@@ -91,7 +91,7 @@ void le_lote_pedido(SLOT * ptr, int expectedUserInputId) {
   convertNumToType(ConvertedtypeName, ( * ptr).lote.type, TRUE);
 
   if ((expectedUserInputId == ( * ptr).lote.id) && (( * ptr).flag == 1)) {
-    printf("\n\n=== Produto ===\n Id: %d\n Destination:%s\n Quantity:%d\n Type:%s\n Exp. Date:%s\n\n",
+    printf("\n\n=== Produto ===\n Id: %d\n Destination:%s\n Quantity:%d\n Type:%s\n Exp. Date:%s",
       ( * ptr).lote.id,
       ( * ptr).lote.destiny,
       ( * ptr).lote.quantity,
@@ -107,7 +107,7 @@ void le_lote_pedido(SLOT * ptr, int expectedUserInputId) {
  * @param ptr pointer to the slot
  */
 void le_lote_completo(SLOT * ptr) {
-  printf("\n\n=== Produto ===\n Id: %d\n Destination:%s\n Quantity:%d\n Type:%d\n Exp. Date:%s\n\n",
+  printf("\n\n=== Produto ===\n Id: %d\n Destination:%s\n Quantity:%d\n Type:%d\n Exp. Date:%s",
     ( * ptr).lote.id,
     ( * ptr).lote.destiny,
     ( * ptr).lote.quantity,
@@ -145,9 +145,8 @@ void le_slot_completo(SLOT * ptr) {
  * @param inputFlagState This is a char array that will be used to store the flag state of the slot.
  * @param giveBoolVal TRUE or FALSE
  * 
- * @return the value of the flag variable.
+ * @return the value of the flag variable in the slot structure.
  */
-
 int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
   if (giveBoolVal == FALSE) {
     if (( * ptr).flag == 0) {
@@ -169,15 +168,29 @@ int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
   }
   return 0;
 }
+
+/**
+ * It takes an input number, and prints out the slot position of the number
+ * 
+ * @param inputNum the number that is inputted by the user
+ */
+void print_NumToSlotPosition(int inputNum) {
+  inputNum = inputNum % 100;
+  int decimal = inputNum / 10;
+  int unit = inputNum % 10;
+  printf("\n Slot: %d %d", decimal, unit);
+}
+
 /****************************************************************
  ***********************  Funções  *******************************
  ****************************************************************/
 /**
- * It reads a file and prints the contents of it
+ * It reads a tray file and prints the contents of the file in a matrix format
  * 
- * @param override if true, it will read from a file called "tray.txt" directly from the command line
+ * @param override If the user inputted a file name, it will be FALSE. If the user did not input a file
+ * name, it will be TRUE.
  * 
- * @return the number of characters that were written to the file.
+ * @return the value 0.
  */
 int showTray(bool override) {
   FILE * fp;
@@ -192,6 +205,8 @@ int showTray(bool override) {
 
   int typeVarInt;
   char typeVarChar;
+  /* Checking if the user inputted a file name, and if the user did not input a file name, it will open
+  the file "tray.txt" */
   if (override == FALSE) {
     getchar(); // Para apanhar o [enter]
     printf("Filename: ");
@@ -202,18 +217,22 @@ int showTray(bool override) {
     fp = fopen("tray.txt", "r");
   }
 
-  if (fp == NULL) { //d´a NULL porque n~ao est´a a apontar para nada
+  /* Checking if the file is open. If it is not, it prints an error message and exits the program. */
+  if (fp == NULL) {
     printf("Error opening text file\n");
     exit(1);
   }
 
+  /* Reading a file and printing the contents of the file. */
   while (fgets(strToReadInput, sizeof(strToReadInput), fp)) {
     fscanf(fp, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); // fscanf(fp, "%d %d", &inputVar, &typeVar);
 
+    /* Printing a new line every 4 lines. */
     if (!(countLoop % 4)) {
       printf("\n");
     }
 
+    /* Converting the inputVar to a character and printing it. */
     convertNumToType( & typeVarChar, typeVarInt, FALSE);
     printf(" %d_%c ", inputVar, typeVarChar);
 
@@ -233,9 +252,12 @@ int showTray(bool override) {
  */
 int showCompleteBatch() {
 
+  /* Opening the file warehouse.dat in binary mode for reading and writing. */
   FILE * fp = fopen("warehouse.dat", "rb+");
+
   SLOT slotExample;
   int countLine = 0;
+
   /* Checking if the file is open. If it is not, it prints an error message and exits the program. */
   if (fp == NULL) {
     printf("Error opening binary file\n");
@@ -248,9 +270,13 @@ int showCompleteBatch() {
 
     /* Counting the number of slots that are occupied in the warehouse. */
     countLine = countLine + 1;
+    int Shelf = countLine / 100;
+
     if ((slotExample.flag == 1)) {
-      printf("\n\n%d\n\n", countLine);
+      print_NumToSlotPosition(countLine);
+      printf(" Shelf: %d", Shelf);
     }
+
   }
 
   fclose(fp);
@@ -264,21 +290,36 @@ int showCompleteBatch() {
  * @return the value 0.
  */
 int batchInfo() {
+
+  /* Opening the file warehouse.dat in binary mode for reading and writing. */
   FILE * fp = fopen("warehouse.dat", "rb+");
+
   SLOT slotExample;
   int userInputId;
+  int countLine = 0;
 
+  /* Asking the user to input an ID number. */
   printf("ID: ");
   scanf("%d", & userInputId);
   getchar();
 
+  /* Opening a file and checking if it is NULL. If it is NULL, it will print an error message and exit. */
   if (fp == NULL) {
     printf("Error opening binary file\n");
     exit(1);
   }
 
+  /* Reading the file and printing the slot position and shelf number. */
   while (fread( & slotExample, sizeof(SLOT), 1, fp)) {
     le_slot_pedido( & slotExample, userInputId);
+
+    /* Printing the shelf number and slot position. */
+    countLine = countLine + 1;
+    int Shelf = countLine / 100;
+    if ((slotExample.flag == 1)) {
+      print_NumToSlotPosition(countLine);
+      printf(" Shelf: %d", Shelf);
+    }
   }
 
   fclose(fp);
@@ -383,7 +424,6 @@ void choices() {
   int choiceSucess = 0;
 
   FILE * fp;
-
   fp = fopen("warehouse.dat", "rb");
   if (fp == NULL) {
     printf("Error opening warehouse file\n");
