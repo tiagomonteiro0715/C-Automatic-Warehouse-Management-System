@@ -58,7 +58,7 @@ SLOT;
  * @param expectedUserInputId The id that the user inputted
  */
 void le_lote_pedido(SLOT * ptr, int expectedUserInputId) {
-  if (expectedUserInputId == ( * ptr).lote.id) {
+  if ((expectedUserInputId == ( * ptr).lote.id) && (( * ptr).flag == 1)) {
     printf("\n\n=== Produto ===\n Id: %d\n Destination:%s\n Quantity:%d\n Type:%d\n Exp. Date:%s\n\n",
       ( * ptr).lote.id,
       ( * ptr).lote.destiny,
@@ -75,12 +75,12 @@ void le_lote_pedido(SLOT * ptr, int expectedUserInputId) {
  * @param ptr pointer to the slot
  */
 void le_lote_completo(SLOT * ptr) {
-  printf("\n\n id: %d destiny:%s date:%s quantity:%d type:%d",
+  printf("\n\n=== Produto ===\n Id: %d\n Destination:%s\n Quantity:%d\n Type:%d\n Exp. Date:%s\n\n",
     ( * ptr).lote.id,
     ( * ptr).lote.destiny,
-    ( * ptr).lote.date,
     ( * ptr).lote.quantity,
-    ( * ptr).lote.type
+    ( * ptr).lote.type,
+    ( * ptr).lote.date
   );
 }
 
@@ -100,11 +100,8 @@ void le_slot_pedido(SLOT * ptr, int expectedUserInputId) {
  * @param ptr pointer to the slot
  */
 void le_slot_completo(SLOT * ptr) {
-  if(( * ptr).flag == 1){
-   le_lote_completo(ptr);
-    printf(" flag:%d \n",
-    ( * ptr).flag
-  ); 
+  if (( * ptr).flag == 1) {
+    le_lote_completo(ptr);
   }
 }
 
@@ -166,7 +163,7 @@ void convertNumToType(char * saveCharVar, int inputInt, bool fullText) {
 /**
  * It reads a file and prints the contents of it
  * 
- * @param override if true, it will read from a file called "tray.txt"
+ * @param override if true, it will read from a file called "tray.txt" directly from the command line
  * 
  * @return the number of characters that were written to the file.
  */
@@ -201,7 +198,7 @@ int showTray(bool override) {
   }
 
   while (fgets(strToReadInput, sizeof(strToReadInput), fp)) {
-    fscanf(fp, "%d %s %s %d %d", &inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); // fscanf(fp, "%d %d", &inputVar, &typeVar);
+    fscanf(fp, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); // fscanf(fp, "%d %d", &inputVar, &typeVar);
 
     if (!(countLoop % 4)) {
       printf("\n");
@@ -227,16 +224,14 @@ int showTray(bool override) {
 int showCompleteBatch() {
 
   FILE * fp = fopen("warehouse.dat", "rb+");
-  SLOT slotExample[5][10][10];
-  SLOT slotExampleOne;
+  SLOT slotExample;
   if (fp == NULL) {
     printf("Error opening binary file\n");
     exit(1);
   }
-  while(fread(&slotExampleOne, sizeof(SLOT), 1, fp)){
-  		le_slot_completo(&slotExampleOne);
-    }
-  
+  while (fread( & slotExample, sizeof(SLOT), 1, fp)) {
+    le_slot_completo( & slotExample);
+  }
 
   fclose(fp);
 
@@ -265,7 +260,7 @@ int batchInfo() {
   while (fread( & slotExample, sizeof(SLOT), 1, fp)) {
     le_slot_pedido( & slotExample, userInputId);
   }
-  
+
   fclose(fp);
 
   return 0;
@@ -294,7 +289,7 @@ int warehouseOccupancy() {
 
   printf("\n\n -----WAREHOUSE-----\n");
   printf(" 0 1 2 3 4 5 6 7 8 9\n");
-  
+
   while (fread( & slotExample, sizeof(SLOT), 1, fp)) {
     if (!(countLine % 9)) {
       printCurrentLine += 1;
