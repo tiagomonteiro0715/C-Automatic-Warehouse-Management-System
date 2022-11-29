@@ -235,12 +235,22 @@ int showCompleteBatch() {
 
   FILE * fp = fopen("warehouse.dat", "rb+");
   SLOT slotExample;
+  int countLine = 0;
+  /* Checking if the file is open. If it is not, it prints an error message and exits the program. */
   if (fp == NULL) {
     printf("Error opening binary file\n");
     exit(1);
   }
+
+  /* Reading the binary file and printing the contents of the file. */
   while (fread( & slotExample, sizeof(SLOT), 1, fp)) {
     le_slot_completo( & slotExample);
+
+    /* Counting the number of slots that are occupied in the warehouse. */
+    countLine = countLine + 1;
+    if ((slotExample.flag == 1)) {
+      printf("\n\n%d\n\n", countLine);
+    }
   }
 
   fclose(fp);
