@@ -355,6 +355,7 @@ int warehouseOccupancy() {
     exit(1);
   }
 
+
   switch (userInputShelf) {
   case 0: //fazer função para isto tudo. usar   int shelf = printCurrentLine/10;
     printf("\n\n -----WAREHOUSE-----\n");
