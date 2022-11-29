@@ -333,35 +333,57 @@ int batchInfo() {
  * @return the number of slots that are occupied in the warehouse.
  */
 int warehouseOccupancy() {
+
+  /* Opening the file warehouse.dat in binary mode for reading and writing. */
   FILE * fp = fopen("warehouse.dat", "rb+");
   SLOT slotExample;
+
+  /* Declaring the variables that will be used in the program. */
   char input;
   int userInputShelf;
-  int countLine = 1;
   int printCurrentLine = 0;
+  int shelf = printCurrentLine / 10;
+
+  /* Asking the user to input the shelf number. */
   printf("Shelf: ");
   scanf("%d", & userInputShelf);
   getchar();
 
+  /* Opening a file and checking if it is NULL. If it is NULL, it will print an error message and exit. */
   if (fp == NULL) {
     printf("Error opening binary file\n");
     exit(1);
   }
 
-  printf("\n\n -----WAREHOUSE-----\n");
-  printf(" 0 1 2 3 4 5 6 7 8 9\n");
+  switch (userInputShelf) {
+  case 0: //fazer função para isto tudo. usar   int shelf = printCurrentLine/10;
+    printf("\n\n -----WAREHOUSE-----\n");
+    printf(" 0 1 2 3 4 5 6 7 8 9");
 
-  while (fread( & slotExample, sizeof(SLOT), 1, fp)) {
-    if (!(countLine % 9)) {
-      printCurrentLine += 1;
-      printf("%d\n", printCurrentLine);
+    for (int countLine = 90 * shelf; fread( & slotExample, sizeof(SLOT), 1, fp) && countLine < 90 * (shelf + 1); countLine++) {
+      if (!(countLine % 9 && (countLine != 0))) {
+        printf("\n %d ", (printCurrentLine % 10));
+        printCurrentLine += 1;
+      }
+
+      checkOccupancy( & slotExample, & input, FALSE);
+      printf("%c ", input);
     }
-    checkOccupancy( & slotExample, & input, FALSE);
-    printf("%c ", input);
+    break;
 
-    countLine += 1;
+  case 1:
+
+    break;
+
+  case 2:
+    break;
+
+  case 3:
+    break;
+
+  case 4:
+    break;
   }
-
   return 0;
 }
 
