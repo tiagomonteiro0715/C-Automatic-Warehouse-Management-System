@@ -225,16 +225,19 @@ int showTray(bool override) {
 
   /* Reading a file and printing the contents of the file. */
   while (fgets(strToReadInput, sizeof(strToReadInput), fp)) {
-    fscanf(fp, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); // fscanf(fp, "%d %d", &inputVar, &typeVar);
+    sscanf(strToReadInput, "%d %s %s %d %d", &inputVar, destinyVar, dateVar, &quantityVar, &typeVarInt); // fscanf(fp, "%d %d", &inputVar, &typeVar);
+
+
 
     /* Printing a new line every 4 lines. */
     if (!(countLoop % 4)) {
       printf("\n");
     }
 
+    printf("%2d", inputVar);
     /* Converting the inputVar to a character and printing it. */
     convertNumToType( & typeVarChar, typeVarInt, FALSE);
-    printf(" %d_%c ", inputVar, typeVarChar);
+    printf("_%c ",typeVarChar);
 
     countLoop += 1;
   }
