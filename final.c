@@ -337,6 +337,7 @@ void printInputShelf(FILE * fp, SLOT slotExample, char inputShelf,char inputStor
     int shelfInputVal = atoi(&inputShelf);
     int countAllStateChar;
     int currentShelf;
+;
 
     printf("\n\n -----WAREHOUSE-----\n");
     printf(" 0 1 2 3 4 5 6 7 8 9");
@@ -348,20 +349,19 @@ imprimir á base do valor do printCurrentLine - esse é o que melhor controla as
       if (!(countAllStateChar % 9 && (countAllStateChar != 0))) {
           if(!(printCurrentLine%10)){
           //if(currentShelf == shelfInputVal){printf("\n\n       Shelf %d     ", currentShelf);}
-          //printf("\n\n       Shelf %d     ", currentShelf);
+          printf("\n\n       Shelf %d     ", currentShelf);//o problema é que shelfInputVal fica sempre a 0 não valor do input
+          //fazer esta conversão na função warehouseOccupancy() mesmo não aqui. torca-se o parametro de int para char nos parameetros desta função
           }
           //if(currentShelf == shelfInputVal){printf("\n %d ", (printCurrentLine % 10));}
-          //printf("\n %d ", (printCurrentLine));//% 10
+          printf("\n %d ", (printCurrentLine));//% 10
 
         printCurrentLine += 1;
       }
       checkOccupancy( & slotExample, & inputStoreTempVar, FALSE);
       //if(currentShelf == shelfInputVal){printf("%c ", inputStoreTempVar);}      
-      //printf("%c ", inputStoreTempVar);
+      printf("%c ", inputStoreTempVar);
       currentShelf = printCurrentLine/10;
     }
-
-
 }
 
 
