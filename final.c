@@ -334,20 +334,34 @@ int batchInfo() {
 
 void printInputShelf(FILE * fp, SLOT slotExample, char inputShelf,char inputStoreTempVar){
     int printCurrentLine = 0;
-    fseek( fp, (inputShelf*90), SEEK_CUR);
+    int shelfInputVal = atoi(&inputShelf);
+    int countAllStateChar;
+    int currentShelf;
 
     printf("\n\n -----WAREHOUSE-----\n");
     printf(" 0 1 2 3 4 5 6 7 8 9");
 
-    for (int countLine = 0; fread( & slotExample, sizeof(SLOT), 1, fp); countLine++) {
-      if (!(countLine % 9 && (countLine != 0))) {
-        printf("\n %d ", (printCurrentLine % 10));
+/*
+imprimir á base do valor do printCurrentLine - esse é o que melhor controla as filas todas
+*/
+    for (countAllStateChar = 0; fread( & slotExample, sizeof(SLOT), 1, fp); countAllStateChar++) {
+      if (!(countAllStateChar % 9 && (countAllStateChar != 0))) {
+          if(!(printCurrentLine%10)){
+          //if(currentShelf == shelfInputVal){printf("\n\n       Shelf %d     ", currentShelf);}
+          //printf("\n\n       Shelf %d     ", currentShelf);
+          }
+          //if(currentShelf == shelfInputVal){printf("\n %d ", (printCurrentLine % 10));}
+          //printf("\n %d ", (printCurrentLine));//% 10
+
         printCurrentLine += 1;
       }
       checkOccupancy( & slotExample, & inputStoreTempVar, FALSE);
-      printf("%c ", inputStoreTempVar);
+      //if(currentShelf == shelfInputVal){printf("%c ", inputStoreTempVar);}      
+      //printf("%c ", inputStoreTempVar);
+      currentShelf = printCurrentLine/10;
     }
-    fseek( fp, 0 , SEEK_SET);
+
+
 }
 
 
