@@ -331,6 +331,26 @@ int batchInfo() {
   return 0;
 }
 
+
+void printInputShelf(FILE * fp, SLOT slotExample, char inputShelf,char inputStoreTempVar){
+    int printCurrentLine = 0;
+    fseek( fp, (inputShelf*90), SEEK_CUR);
+
+    printf("\n\n -----WAREHOUSE-----\n");
+    printf(" 0 1 2 3 4 5 6 7 8 9");
+
+    for (int countLine = 0; fread( & slotExample, sizeof(SLOT), 1, fp); countLine++) {
+      if (!(countLine % 9 && (countLine != 0))) {
+        printf("\n %d ", (printCurrentLine % 10));
+        printCurrentLine += 1;
+      }
+      checkOccupancy( & slotExample, & inputStoreTempVar, FALSE);
+      printf("%c ", inputStoreTempVar);
+    }
+    fseek( fp, 0 , SEEK_SET);
+}
+
+
 /**
  * It reads the binary file, and prints out the contents of the file in a grid format
  * 
@@ -343,10 +363,8 @@ int warehouseOccupancy() {
   SLOT slotExample;
 
   /* Declaring the variables that will be used in the program. */
-  char input;
+  char inputStoreTemp = ' ';
   int userInputShelf;
-  int printCurrentLine = 0;
-  int shelf = printCurrentLine / 10;
 
   /* Asking the user to input the shelf number. */
   printf("Shelf: ");
@@ -361,32 +379,24 @@ int warehouseOccupancy() {
 
 
   switch (userInputShelf) {
-  case 0: //fazer função para isto tudo. usar   int shelf = printCurrentLine/10;
-    printf("\n\n -----WAREHOUSE-----\n");
-    printf(" 0 1 2 3 4 5 6 7 8 9");
-
-    for (int countLine = 90 * shelf; fread( & slotExample, sizeof(SLOT), 1, fp) && countLine < 90 * (shelf + 1); countLine++) {
-      if (!(countLine % 9 && (countLine != 0))) {
-        printf("\n %d ", (printCurrentLine % 10));
-        printCurrentLine += 1;
-      }
-
-      checkOccupancy( & slotExample, & input, FALSE);
-      printf("%c ", input);
-    }
+  case 0: //fazer função para isto tudo. usar   int shelf = printCurrentLine/10
+    printInputShelf(fp, slotExample, userInputShelf, inputStoreTemp);
     break;
 
   case 1:
-
+    printInputShelf(fp, slotExample, userInputShelf, inputStoreTemp);
     break;
 
   case 2:
+    printInputShelf(fp, slotExample, userInputShelf, inputStoreTemp);
     break;
 
   case 3:
+    printInputShelf(fp, slotExample, userInputShelf, inputStoreTemp);
     break;
 
   case 4:
+    printInputShelf(fp, slotExample, userInputShelf, inputStoreTemp);
     break;
   }
   return 0;
