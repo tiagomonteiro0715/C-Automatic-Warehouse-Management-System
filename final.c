@@ -339,16 +339,18 @@ void printInputShelf(FILE * fp, SLOT slotExample, int inputShelf, char inputStor
 
   for (countAllCharParser = 0; fread( & slotExample, sizeof(SLOT), 1, fp); countAllCharParser++) {
     if (!(countAllCharParser % 9 && (countAllCharParser != 0))) {
-      if (currentShelf == inputShelf) {
+      /*if (currentShelf == inputShelf) {
         printf("\n %d ", (printCurrentLine % 10));
-      } //printf("\n %d ", (printCurrentLine));//% 10
+      }*/ 
+      printf("\n %d ", (printCurrentLine));//% 10
       printCurrentLine += 1;
     }
 
     checkOccupancy( & slotExample, & inputStoreTempVar, FALSE);
-    if (currentShelf == inputShelf) {
+    /*if (currentShelf == inputShelf) {
       printf("%c ", inputStoreTempVar);
-    } //printf("%c ", inputStoreTempVar);      
+    }*/ 
+    printf("%c ", inputStoreTempVar);      
     currentShelf = printCurrentLine / 10;
   }
 }
@@ -403,9 +405,14 @@ int warehouseOccupancy() {
   return 0;
 }
 
-int storeTray() {
+
+
+int saveTrayToWarehouse() {
 
   FILE * fp;
+  SLOT exampleSlot;
+  FILE * fpWarehouse = fopen("warehouse.dat", "rb+");
+
   char inputTrayName[100];
   char strToReadInput[60];
 
@@ -422,17 +429,33 @@ int storeTray() {
   printf("\n");
   fp = fopen(inputTrayName, "r");
 
-  if (fp == NULL) { //d´a NULL porque n~ao est´a a apontar para nada
+  if (fp == NULL) {
     printf("Error opening text file\n");
     exit(1);
   }
 
+  if (fpWarehouse == NULL) {
+    printf("Error opening binary file\n");
+    exit(1);
+  }
+
+/***************************************************************************/
+/*Zona de codigo a desenvolver*/
   while (fgets(strToReadInput, sizeof(strToReadInput), fp)) {
     fscanf(fp, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); // fscanf(fp, "%d %d", &inputVar, &typeVar);
   }
 
+  while (fread( & exampleSlot, sizeof(SLOT), 1, fpWarehouse)) {
+    if(exampleSlot.flag == 0){
+
+  }
+  }
+
+
+/***************************************************************************/
+
   fclose(fp);
-  return 0;
+  fclose(fpWarehouse);
 
   return 0;
 }
@@ -488,7 +511,7 @@ void choices() {
       showMenu();
       break;
     case '5':
-      storeTray();
+      saveTrayToWarehouse();
       showMenu();
       break;
     case '6':
