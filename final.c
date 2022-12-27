@@ -171,7 +171,7 @@ int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
   return 0;
 }
 
-void saveWarehouseIdsToArray(int idArray[MAX_WAREHOUSE], FILE * filePtrWarehouse) {
+void saveWarehouseIdsToArray(int idArray[], FILE * filePtrWarehouse) {
 
   int i = 0;
   char flagState;//só temos isto para conseguirmos usar a função checkOccupancy() sem termos que criar outra
@@ -440,7 +440,13 @@ int saveTrayToWarehouse() {
 
   char inputTrayName[100];
   char strToReadInput[60];
-  int arrayStoreWarehouseId[MAX_WAREHOUSE];
+
+  int * arrayStoreWarehouseId;//perceber isto mesmo bem
+  arrayStoreWarehouseId = malloc(MAX_WAREHOUSE);
+  /*usei malloc pois com memoria fixa obtia valores grandes negativos e positivos. 
+  Com malloc reserva logo 500 e esses estaram a 0
+  Agora é possivel ver se os id
+  */
 
   int inputVar;
   char destinyVar[MAX_DESTINY_STR];
@@ -466,7 +472,9 @@ int saveTrayToWarehouse() {
 
   saveWarehouseIdsToArray(arrayStoreWarehouseId, fpWarehouse);
   for (int j = 0; j <= 50; j++) {
-    printf("Value of index %d: %d\n\n", j, arrayStoreWarehouseId[j]);
+    if(arrayStoreWarehouseId[j] != 0){
+      printf("Value of index %d: %d\n\n", j, arrayStoreWarehouseId[j]);
+    }
   }
 
   /***************************************************************************/
@@ -485,6 +493,8 @@ int saveTrayToWarehouse() {
 */
   /***************************************************************************/
 
+
+  free(arrayStoreWarehouseId);
   fclose(fp);
   fclose(fpWarehouse);
 
