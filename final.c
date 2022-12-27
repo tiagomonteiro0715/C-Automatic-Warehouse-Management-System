@@ -18,7 +18,7 @@
 #define NUM_PRATELEIRAS 4
 #define LATERAL_SIZE 9
 
-#define MAX_ID_TRAY 15
+#define MAX_WAREHOUSE 500
 
 /****************************************************************
  *****************  Declaração de estruturas  *******************
@@ -171,6 +171,21 @@ int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
   return 0;
 }
 
+void saveWarehouseIdsToArray(int idArray[MAX_WAREHOUSE], FILE * filePtrWarehouse) {
+
+  int i = 0;
+  char flagState;//só temos isto para conseguirmos usar a função checkOccupancy() sem termos que criar outra
+  SLOT exampleSlot;
+
+  for (i=0; fread( & exampleSlot, sizeof(SLOT), 1, filePtrWarehouse); i++) {
+    if(checkOccupancy(&exampleSlot, &flagState, TRUE)== TRUE){
+      idArray[i] = exampleSlot.lote.id;
+    }
+  }
+
+}
+
+
 /**
  * It takes an input number, and prints out the slot position of the number
  * 
@@ -227,7 +242,7 @@ int showTray(bool override) {
 
   /* Reading a file and printing the contents of the file. */
   while (fgets(strToReadInput, sizeof(strToReadInput), fp)) {
-    sscanf(strToReadInput, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); // fscanf(fp, "%d %d", &inputVar, &typeVar);
+    sscanf(strToReadInput, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); 
 
     /* Printing a new line every 4 lines. */
     if (!(countLoop % 4)) {
@@ -407,22 +422,14 @@ int warehouseOccupancy() {
   return 0;
 }
 
-void saveTrayIdsToArray(int idArray[MAX_ID_TRAY], FILE * filePtrTray) {
-
-  int i = 0;
-  char strToReadInput[60];
-
-  int inputVar;
-  char destinyVar[MAX_DESTINY_STR];
-  char dateVar[MAX_DATE_STR];
-  int quantityVar;
-  int typeVarInt;
-
-  for (i = 0; fgets(strToReadInput, sizeof(strToReadInput), filePtrTray); i++) {
-    sscanf(strToReadInput, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt);
-    idArray[i] = inputVar;
+int checkId(int arrayWarehouse[MAX_WAREHOUSE], int ID){
+  int i;
+  for (i = 0; i<= MAX_WAREHOUSE;i++){
+    if(ID == arrayWarehouse[i]){
+      return TRUE;
+    }
   }
-
+  return FALSE;
 }
 
 int saveTrayToWarehouse() {
@@ -433,7 +440,7 @@ int saveTrayToWarehouse() {
 
   char inputTrayName[100];
   char strToReadInput[60];
-  int arrayStoreTrayId[MAX_ID_TRAY];
+  int arrayStoreWarehouseId[MAX_WAREHOUSE];
 
   int inputVar;
   char destinyVar[MAX_DESTINY_STR];
@@ -457,25 +464,25 @@ int saveTrayToWarehouse() {
     exit(1);
   }
 
-  saveTrayIdsToArray(arrayStoreTrayId, fp);
-  for (int j = 0; j <= 15; j++) {
-    printf("Value of index %d: %d\n\n", j, arrayStoreTrayId[j]);
+  saveWarehouseIdsToArray(arrayStoreWarehouseId, fpWarehouse);
+  for (int j = 0; j <= 50; j++) {
+    printf("Value of index %d: %d\n\n", j, arrayStoreWarehouseId[j]);
   }
 
   /***************************************************************************/
-  /*Zona de codigo a desenvolver*/
-  /*while (fgets(strToReadInput, sizeof(strToReadInput), fp) && fread( & exampleSlot, sizeof(SLOT), 1, fpWarehouse)) {
-    fscanf(fp, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); // fscanf(fp, "%d %d", &inputVar, &typeVar);
+  /*Zona de codigo a desenvolver
+  while (fgets(strToReadInput, sizeof(strToReadInput), fp) && fread( & exampleSlot, sizeof(SLOT), 1, fpWarehouse)) {
+    sscanf(strToReadInput, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); 
     
-    if(exampleSlot.lote.id != 0){  
-      printf("Repeated product ID: %d Discarting", exampleSlot.lote.id);
-    } else{
+    if((checkId(arrayStoreWarehouseId, inputVar))){
+      printf("Repeated product Id: %d Discarting", exampleSlot.lote.id);
+    }else{
 
     }
 
 
-  }*/
-
+  }
+*/
   /***************************************************************************/
 
   fclose(fp);
