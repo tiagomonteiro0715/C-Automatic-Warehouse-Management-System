@@ -422,7 +422,7 @@ int warehouseOccupancy() {
   return 0;
 }
 
-int checkId(int arrayWarehouse[MAX_WAREHOUSE], int ID){
+int checkId(int arrayWarehouse[], int ID){
   int i;
   for (i = 0; i<= MAX_WAREHOUSE;i++){
     if(ID == arrayWarehouse[i]){
@@ -435,7 +435,7 @@ int checkId(int arrayWarehouse[MAX_WAREHOUSE], int ID){
 int saveTrayToWarehouse() {
 
   FILE * fp;
-  SLOT exampleSlot;
+  //SLOT exampleSlot;
   FILE * fpWarehouse = fopen("warehouse.dat", "rb+");
 
   char inputTrayName[100];
@@ -471,25 +471,71 @@ int saveTrayToWarehouse() {
   }
 
   saveWarehouseIdsToArray(arrayStoreWarehouseId, fpWarehouse);
+  /*Codigo teste para ver se array está bem preechida ou não
   for (int j = 0; j <= 50; j++) {
     if(arrayStoreWarehouseId[j] != 0){
       printf("Value of index %d: %d\n\n", j, arrayStoreWarehouseId[j]);
     }
   }
-
+  */
   /***************************************************************************/
-  /*Zona de codigo a desenvolver
-  while (fgets(strToReadInput, sizeof(strToReadInput), fp) && fread( & exampleSlot, sizeof(SLOT), 1, fpWarehouse)) {
+  //Zona de codigo a desenvolver
+  while (fgets(strToReadInput, sizeof(strToReadInput), fp)) {//&& fread( & exampleSlot, sizeof(SLOT), 1, fpWarehouse)
     sscanf(strToReadInput, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt); 
     
     if((checkId(arrayStoreWarehouseId, inputVar))){
-      printf("Repeated product Id: %d Discarting", exampleSlot.lote.id);
+      printf("Repeated product Id: %d Discarting\n\n", inputVar);
     }else{
 
     }
 
 
   }
+/*  O QUE FALTA FAZER?
+
+Novo ficheiro tray de teste - colocar valores ID random
+coordenadas do tray - consegue-se a partir de uma constante que soma as posição em que vamos:
+Id: 1 tray: constante/4  constante%4 SLOT: (???proxima localização  livre acho eu???)
+
+
+(???proxima localização  livre acho eu???) - converter posicao numaro em posicao coordenadas
+
+posso usar a função (???proxima localização  livre acho eu???) ou não??
+
+criar função de escrita com fwrite e fseek - só faz mesmo isto
+
+
+Acho que posso tenho é que ter um bool override para funcionar só neste caso
+
+É melhor fazer uma função que receba um inteiro de onde vamos e converta para coordenadas.
+Depois fazo nessa função bool override para a função:"troca lote de slot", onde tenho que converter coordenada em inteiro
+Fazer função convert position(bool valToCoordenates)
+
+usar função de saveWarehouseIdsToArray para obter os id e verificar se está lá ou não
+MEsma função checkid e ignorar as posições a 0 com o if
+
+
+  int * arrayStoreWarehouseId;//perceber isto mesmo bem
+  arrayStoreWarehouseId = malloc(MAX_WAREHOUSE);
+
+  criar função que depois de correr um programa tenho que fazer enter para voltar ao menu
+
+
+  ESTATISTICAS
+  estrutura com cada cidade
+
+  struct cidade = {
+    Char cidade;
+    int cartao;
+    int livrete
+  }
+
+  cidade[10] - ir buscar numero de cidades em portugal
+
+  função que capte todas as cidades da wharehouse e crie uma array de structs co o tamanha do numero de todas as grandes cidades em portugal(pode ser conselhos)
+
+  Depois é facil é so criar duas funções para apresentar os valores:
+  uma para a tabela e outro com os asteriscos
 */
   /***************************************************************************/
 
