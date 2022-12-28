@@ -431,19 +431,20 @@ int checkId(int arrayWarehouse[], int ID) {
   return FALSE;
 }
 
-int positionConvertion(int valPositionStore, int coordenatesStore[2], bool isPositionToCoordinates){
+int positionConvertion(int valPositionStore, int coordenatesStore[2], bool isPositionToCoordinates) {
 
-  if(isPositionToCoordinates == TRUE){
+  if (isPositionToCoordinates == TRUE) {
     return 0;
   }
 
-  if(isPositionToCoordinates == FALSE){
+  if (isPositionToCoordinates == FALSE) {
 
     return valPositionStore;
   }
   return 0;
 }
 
+/*
 void writeToWharehouse(FILE * filePtrWare, SLOT * SlotToWrite, long int offset){
    filePtrWare = fopen("warehouse.dat", "r+b");//voltamos a abrilo para o programa continuar a correr como normal
    //ab+ - append in binary at the end of a file
@@ -456,6 +457,78 @@ void writeToWharehouse(FILE * filePtrWare, SLOT * SlotToWrite, long int offset){
   fclose(filePtrWare);//Para que o ficheiro seja escrito
   //filePtrWare = fopen("warehouse.dat", "rb+");//voltamos a abrilo para o programa continuar a correr como normal
 
+}
+*/
+
+/*
+void saveWarehouseToStruct(FILE * fp, SLOT structToStoreFile[MAX_WAREHOUSE]){
+  int i;
+  SLOT BUFFER;
+    for (i=1; fread( &BUFFER, sizeof(SLOT), 1, fp) && (i < MAX_WAREHOUSE); i++) {
+    structToStoreFile[i].flag =  BUFFER.flag;
+    structToStoreFile[i].lote.id =  BUFFER.lote.id;
+    strcpy(structToStoreFile[i].lote.destiny, BUFFER.lote.destiny);
+    strcpy(structToStoreFile[i].lote.date, BUFFER.lote.date);
+    structToStoreFile[i].lote.quantity =  BUFFER.lote.quantity;
+    structToStoreFile[i].lote.type =  BUFFER.lote.type;
+    }
+}
+*/
+/*
+void saveWarehouseToStruct(FILE * fp, SLOT structToStoreFile[MAX_WAREHOUSE]){
+
+  int i;
+  SLOT *structBuffer = malloc(sizeof(SLOT));
+  
+  for (i=1;i < MAX_WAREHOUSE; i++) {
+  
+  fread(&structBuffer->flag, sizeof(structBuffer->flag), 1, fp);
+  fread(&structBuffer->lote.id, sizeof(structBuffer->lote.id), 1, fp);
+
+  fread(&structBuffer->lote.destiny, sizeof(structBuffer->lote.destiny), 1, fp);
+  fread(&structBuffer->lote.date, sizeof(structBuffer->lote.date), 1, fp);
+
+  fread(&structBuffer->lote.quantity, sizeof(structBuffer->lote.quantity), 1, fp);
+  fread(&structBuffer->lote.type, sizeof(structBuffer->lote.type), 1, fp);
+
+  printf("%d %d %s %s %d %d\n", 
+  structBuffer->flag, 
+  structBuffer->lote.id, 
+  structBuffer->lote.destiny,
+  structBuffer->lote.date,
+  structBuffer->lote.quantity,
+  structBuffer->lote.type);
+
+    structToStoreFile[i].flag =  structBuffer->flag;
+    structToStoreFile[i].lote.id =  structBuffer->lote.id;
+    strcpy(structToStoreFile[i].lote.destiny, structBuffer->lote.destiny);
+    strcpy(structToStoreFile[i].lote.date, structBuffer->lote.date);
+    structToStoreFile[i].lote.quantity =  structBuffer->lote.quantity;
+    structToStoreFile[i].lote.type =  structBuffer->lote.type;
+    }
+
+
+  free(structBuffer);
+}
+*/
+
+void saveWarehouseToStruct(FILE * fp, SLOT structToStoreFile[MAX_WAREHOUSE]) {
+  int i = 0;
+  SLOT structBuffer;
+  while (fread( & structBuffer, sizeof(SLOT), 1, fp)) {
+    le_slot_completo( & structBuffer);//https://stackoverflow.com/questions/3988709/read-binary-data-from-file-into-a-struct
+/*por alguma razão não imprime os valores bem - parece que está a ler os valores mal - pode ter haver com o malloc*/
+    /*
+    structToStoreFile[i].flag =  structBuffer.flag;
+    structToStoreFile[i].lote.id =  structBuffer.lote.id;
+    strcpy(structToStoreFile[i].lote.destiny, structBuffer.lote.destiny);
+    strcpy(structToStoreFile[i].lote.date, structBuffer.lote.date);
+    structToStoreFile[i].lote.quantity =  structBuffer.lote.quantity;
+    structToStoreFile[i].lote.type =  structBuffer.lote.type;
+    */
+
+    i = i + 1;
+  }
 }
 
 int saveTrayToWarehouse() {
@@ -505,31 +578,28 @@ int saveTrayToWarehouse() {
   }
   */
 
+  /*
+  struct loteCompleto {
+    int id; //4 bytes
+    char destiny[MAX_DESTINY_STR]; //30 bytes
+    char date[MAX_DATE_STR]; //12 bytes
+    int quantity; //4 bytes
+    int type; //4 bytes
+  };
+  */
+  SLOT EXEMPLO;
+  EXEMPLO.flag = 1;
+  EXEMPLO.lote.id = 44;
+  strcpy(EXEMPLO.lote.date, "2022-07-12");
+  strcpy(EXEMPLO.lote.destiny, "LISBOA");
+  EXEMPLO.lote.quantity = 23;
+  EXEMPLO.lote.type = 1;
 
+  //long int positionOne = 50;
+  //long int positionTwo = 70;
 
-/*
-struct loteCompleto {
-  int id; //4 bytes
-  char destiny[MAX_DESTINY_STR]; //30 bytes
-  char date[MAX_DATE_STR]; //12 bytes
-  int quantity; //4 bytes
-  int type; //4 bytes
-};
-*/
-SLOT EXEMPLO;
-
-EXEMPLO.flag = 1;
-EXEMPLO.lote.id = 44;
-strcpy(EXEMPLO.lote.date, "2022-07-12");
-strcpy(EXEMPLO.lote.destiny, "LISBOA");
-EXEMPLO.lote.quantity = 23;
-EXEMPLO.lote.type = 1;
-
-long int positionOne = 50;
-long int positionTwo = 70;
-writeToWharehouse(fpWarehouse, &EXEMPLO, positionOne);
-writeToWharehouse(fpWarehouse, &EXEMPLO, positionTwo);
-
+  SLOT completeFile[MAX_WAREHOUSE];
+  saveWarehouseToStruct(fpWarehouse, completeFile);
 
   /***************************************************************************/
   //Zona de codigo a desenvolver
@@ -560,9 +630,6 @@ void print_NumToSlotPosition(int inputNum) {
   (???proxima localização  livre acho eu???) - converter posicao numaro em posicao coordenadas
 
   posso usar a função (???proxima localização  livre acho eu???) ou não??
-
-  criar função de escrita com fwrite e fseek - só faz mesmo isto
-
 
   Acho que posso tenho é que ter um bool override para funcionar só neste caso
 
