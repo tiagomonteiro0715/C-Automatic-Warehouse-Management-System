@@ -431,6 +431,33 @@ int checkId(int arrayWarehouse[], int ID) {
   return FALSE;
 }
 
+int positionConvertion(int valPositionStore, int coordenatesStore[2], bool isPositionToCoordinates){
+
+  if(isPositionToCoordinates == TRUE){
+    return 0;
+  }
+
+  if(isPositionToCoordinates == FALSE){
+
+    return valPositionStore;
+  }
+  return 0;
+}
+
+void writeToWharehouse(FILE * filePtrWare, SLOT * SlotToWrite, long int offset){
+   filePtrWare = fopen("warehouse.dat", "r+b");//voltamos a abrilo para o programa continuar a correr como normal
+   //ab+ - append in binary at the end of a file
+   int positionToWrite;
+   positionToWrite = (sizeof(SLOT)*offset);
+
+   fseek( filePtrWare, positionToWrite, SEEK_CUR);
+   fwrite(&SlotToWrite, sizeof(SLOT), 1, filePtrWare);
+
+  fclose(filePtrWare);//Para que o ficheiro seja escrito
+  //filePtrWare = fopen("warehouse.dat", "rb+");//voltamos a abrilo para o programa continuar a correr como normal
+
+}
+
 int saveTrayToWarehouse() {
 
   FILE * fp;
@@ -477,24 +504,57 @@ int saveTrayToWarehouse() {
     }
   }
   */
+
+
+
+/*
+struct loteCompleto {
+  int id; //4 bytes
+  char destiny[MAX_DESTINY_STR]; //30 bytes
+  char date[MAX_DATE_STR]; //12 bytes
+  int quantity; //4 bytes
+  int type; //4 bytes
+};
+*/
+SLOT EXEMPLO;
+
+EXEMPLO.flag = 1;
+EXEMPLO.lote.id = 44;
+strcpy(EXEMPLO.lote.date, "2022-07-12");
+strcpy(EXEMPLO.lote.destiny, "LISBOA");
+EXEMPLO.lote.quantity = 23;
+EXEMPLO.lote.type = 1;
+
+long int positionOne = 50;
+long int positionTwo = 70;
+writeToWharehouse(fpWarehouse, &EXEMPLO, positionOne);
+writeToWharehouse(fpWarehouse, &EXEMPLO, positionTwo);
+
+
   /***************************************************************************/
   //Zona de codigo a desenvolver
   while (fgets(strToReadInput, sizeof(strToReadInput), fp)) { //&& fread( & exampleSlot, sizeof(SLOT), 1, fpWarehouse)
     sscanf(strToReadInput, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt);
 
     if ((checkId(arrayStoreWarehouseId, inputVar))) {
-      printf("Repeated product Id: %d Discarting\n\n", inputVar);
+      printf("\nRepeated product Id: %d Discarting\n\n", inputVar);
     } else {
 
     }
 
   }
   /*  O QUE FALTA FAZER? - ATE 6 FEIRA O TRABALHO TEM QUE ESTAR FEITO 
-  ASSIM tenho tempo para estudar outras cadeiras
 
-  Novo ficheiro tray de teste - colocar valores ID random
   coordenadas do tray - consegue-se a partir de uma constante que soma as posição em que vamos:
+
   Id: 1 tray: constante/4  constante%4 SLOT: (???proxima localização  livre acho eu???)
+
+void print_NumToSlotPosition(int inputNum) {
+  inputNum = inputNum % 100;
+  int decimal = inputNum / 10;
+  int unit = inputNum % 10;
+  printf("\n Slot: %d %d", decimal, unit);
+}
 
 
   (???proxima localização  livre acho eu???) - converter posicao numaro em posicao coordenadas
