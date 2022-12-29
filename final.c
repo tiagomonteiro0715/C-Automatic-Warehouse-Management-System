@@ -171,7 +171,6 @@ int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
   return 0;
 }
 
-
 /**
  * It takes an input number, and prints out the slot position of the number
  * 
@@ -489,18 +488,15 @@ void saveWarehouseToStruct(FILE * fp, SLOT structToStoreFile[MAX_WAREHOUSE]){
 }
 */
 
-
 /*por alguma razão não imprime os valores bem - parece que está a ler os valores mal - pode ter haver com o malloc*/
-    /*
-    structToStoreFile[i].flag =  structBuffer.flag;
-    structToStoreFile[i].lote.id =  structBuffer.lote.id;
-    strcpy(structToStoreFile[i].lote.destiny, structBuffer.lote.destiny);
-    strcpy(structToStoreFile[i].lote.date, structBuffer.lote.date);
-    structToStoreFile[i].lote.quantity =  structBuffer.lote.quantity;
-    structToStoreFile[i].lote.type =  structBuffer.lote.type;
-    */
-
-
+/*
+structToStoreFile[i].flag =  structBuffer.flag;
+structToStoreFile[i].lote.id =  structBuffer.lote.id;
+strcpy(structToStoreFile[i].lote.destiny, structBuffer.lote.destiny);
+strcpy(structToStoreFile[i].lote.date, structBuffer.lote.date);
+structToStoreFile[i].lote.quantity =  structBuffer.lote.quantity;
+structToStoreFile[i].lote.type =  structBuffer.lote.type;
+*/
 
 int saveTrayToWarehouse() {
 
@@ -509,8 +505,6 @@ int saveTrayToWarehouse() {
   SLOT structBuffer;
   char inputTrayName[100];
   char strToReadInput[60];
-
-
 
   int inputVar;
   char destinyVar[MAX_DESTINY_STR];
@@ -534,51 +528,60 @@ int saveTrayToWarehouse() {
     exit(1);
   }
 
-
-  FILE * fpTest = fopen("warehouseNew.dat", "wb+");
+  FILE * fpTest = fopen("warehouse1.dat", "wb+");
 
   int repeatedIdArray[MAX_WAREHOUSE];
   int index = 0;
+
   while (fgets(strToReadInput, sizeof(strToReadInput), fp)) { //&& fread( & exampleSlot, sizeof(SLOT), 1, fpWarehouse)
     sscanf(strToReadInput, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt);
 
-  while (fread( & structBuffer, sizeof(SLOT), 1, fpWarehouse)) {
-    fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
+    while (fread( & structBuffer, sizeof(SLOT), 1, fpWarehouse)) {
+      int isrepeated = 0;
 
-      if((structBuffer.lote.id) != inputVar){//tiver o mesmo ID
-        for(int i = 0; i<=MAX_WAREHOUSE;i++){//Para apanhar se ID já existiu numa iteração anterior
-          if (repeatedIdArray[i] == inputVar){
-            printf("\nRepeated product Id: %d Discarting\n\n", inputVar);
+      //fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
+
+      if ((structBuffer.lote.id) == inputVar) { //tiver o mesmo ID
+        repeatedIdArray[index] = inputVar; //adicionar que este ID já foi repetido
+        index = index + 1;
+        printf("\n0 - Repeated product Id: %d Discarting", inputVar);
+        break;
+
+      } else {
+        for (int i = 0; i < MAX_WAREHOUSE; i++) { //Para apanhar se ID já existiu numa iteração anterior
+          if (repeatedIdArray[i] == inputVar) {
+            isrepeated = 1;
+            printf("\n1 - Repeated product Id: %d Discarting", inputVar);
             break;
           }
-        }
-        printf("\nDifferent ID\n\n");
-        break;
-    }else{
-        repeatedIdArray[index] = inputVar;//adicionar que este ID já foi repetido
-        index = index + 1;
-        printf("\nRepeated product Id: %d Discarting\n\n", inputVar);
-        break;
-    }
-  }
-
-
-
-  /*while(fread( & structBuffer, sizeof(SLOT), 1, fpWarehouse)){
-      if(structBuffer.flag == 0){
-        structBuffer.flag = 1;
-        structBuffer.lote.id = inputVar;
-        strcpy(structBuffer.lote.destiny, destinyVar);
-        strcpy(structBuffer.lote.date, dateVar);
-        structBuffer.lote.quantity = quantityVar;
-        structBuffer.lote.type = typeVarInt;
-
-        fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
-        break;//á aqui alguma coisa que falta. isto tem que ser continuo não pode parar porque encontrou um novo valor a escrever
-        //descareegra novos ficheiros tray.txt e warehouse.txt
+        }        
       }
-    }*/
+
+        if(isrepeated == 0){
+          printf("\nNew value");
+          break;
+        }
+        if(isrepeated == 1){
+          isrepeated = 0;
+          break;
+        }
     }
+
+    /*while(fread( & structBuffer, sizeof(SLOT), 1, fpWarehouse)){
+        if(structBuffer.flag == 0){
+          structBuffer.flag = 1;
+          structBuffer.lote.id = inputVar;
+          strcpy(structBuffer.lote.destiny, destinyVar);
+          strcpy(structBuffer.lote.date, dateVar);
+          structBuffer.lote.quantity = quantityVar;
+          structBuffer.lote.type = typeVarInt;
+
+          fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
+          break;//á aqui alguma coisa que falta. isto tem que ser continuo não pode parar porque encontrou um novo valor a escrever
+          //descareegra novos ficheiros tray.txt e warehouse.txt
+        }
+      }*/
+  }
 
   fclose(fp);
   fclose(fpWarehouse);
@@ -587,10 +590,7 @@ int saveTrayToWarehouse() {
   return 0;
 }
 
-
-
-
-  /*  O QUE FALTA FAZER? - ATE 6 FEIRA O TRABALHO TEM QUE ESTAR FEITO 
+/*  O QUE FALTA FAZER? - ATE 6 FEIRA O TRABALHO TEM QUE ESTAR FEITO 
 
   coordenadas do tray - consegue-se a partir de uma constante que soma as posição em que vamos:
 
@@ -647,8 +647,7 @@ void print_NumToSlotPosition(int inputNum) {
     3. por a funcionar na virtualbox
     4. 2 feira - mandar trabalho ao professor e escolher logo a data
   */
-  /***************************************************************************/
-
+/***************************************************************************/
 
 /**
  * It prints a menu
