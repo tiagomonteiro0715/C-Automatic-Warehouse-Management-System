@@ -505,10 +505,8 @@ void saveWarehouseToStruct(FILE * fp, SLOT structToStoreFile[MAX_WAREHOUSE]){
 int saveTrayToWarehouse() {
 
   FILE * fp;
-  //SLOT exampleSlot;
   FILE * fpWarehouse = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
-  char flagState;
   char inputTrayName[100];
   char strToReadInput[60];
 
@@ -537,29 +535,26 @@ int saveTrayToWarehouse() {
   }
 
 
-  FILE * fpTest = fopen("warehouseNew.dat", "wb+");
+  //FILE * fpTest = fopen("warehouseNew.dat", "wb+");
 
-  bool isRepeated;
   while (fgets(strToReadInput, sizeof(strToReadInput), fp)) { //&& fread( & exampleSlot, sizeof(SLOT), 1, fpWarehouse)
     sscanf(strToReadInput, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt);
 
-  for (int i = 0; fread( & structBuffer, sizeof(SLOT), 1, fpWarehouse); i++) {
-    if (checkOccupancy( & structBuffer, & flagState, TRUE) == TRUE) {//se estiver ocupado
-      if((structBuffer.lote.id) == inputVar){//tiver o mesmo ID
-        printf("\nRepeated product Id: %d Discarting\n\n", inputVar);
-        isRepeated = TRUE;
+  while (fread( & structBuffer, sizeof(SLOT), 1, fpWarehouse)) {
+    //      fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
+
+      if((structBuffer.lote.id) != inputVar){//tiver o mesmo ID
+        printf("\nDifferent ID\n\n");
         break;
-    }
+    }else{
+        printf("\nRepeated product Id: %d Discarting\n\n", inputVar);
+        break;
     }
   }
 
 
-if(isRepeated == TRUE){
-  continue;
-}
 
   /*while(fread( & structBuffer, sizeof(SLOT), 1, fpWarehouse)){
-      fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
       if(structBuffer.flag == 0){
         structBuffer.flag = 1;
         structBuffer.lote.id = inputVar;
@@ -577,7 +572,7 @@ if(isRepeated == TRUE){
 
   fclose(fp);
   fclose(fpWarehouse);
-  fclose(fpTest);
+  //fclose(fpTest);
 
   return 0;
 }
