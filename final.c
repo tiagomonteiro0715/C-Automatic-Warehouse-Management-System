@@ -535,18 +535,28 @@ int saveTrayToWarehouse() {
   }
 
 
-  //FILE * fpTest = fopen("warehouseNew.dat", "wb+");
+  FILE * fpTest = fopen("warehouseNew.dat", "wb+");
 
+  int repeatedIdArray[MAX_WAREHOUSE];
+  int index = 0;
   while (fgets(strToReadInput, sizeof(strToReadInput), fp)) { //&& fread( & exampleSlot, sizeof(SLOT), 1, fpWarehouse)
     sscanf(strToReadInput, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt);
 
   while (fread( & structBuffer, sizeof(SLOT), 1, fpWarehouse)) {
-    //      fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
+    fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
 
       if((structBuffer.lote.id) != inputVar){//tiver o mesmo ID
+        for(int i = 0; i<=MAX_WAREHOUSE;i++){//Para apanhar se ID já existiu numa iteração anterior
+          if (repeatedIdArray[i] == inputVar){
+            printf("\nRepeated product Id: %d Discarting\n\n", inputVar);
+            break;
+          }
+        }
         printf("\nDifferent ID\n\n");
         break;
     }else{
+        repeatedIdArray[index] = inputVar;//adicionar que este ID já foi repetido
+        index = index + 1;
         printf("\nRepeated product Id: %d Discarting\n\n", inputVar);
         break;
     }
@@ -572,7 +582,7 @@ int saveTrayToWarehouse() {
 
   fclose(fp);
   fclose(fpWarehouse);
-  //fclose(fpTest);
+  fclose(fpTest);
 
   return 0;
 }
