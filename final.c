@@ -171,19 +171,6 @@ int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
   return 0;
 }
 
-void saveWarehouseIdsToArray(int idArray[], FILE * filePtrWarehouse) {
-
-  int i = 0;
-  char flagState; //só temos isto para conseguirmos usar a função checkOccupancy() sem termos que criar outra
-  SLOT exampleSlot;
-
-  for (i = 0; fread( & exampleSlot, sizeof(SLOT), 1, filePtrWarehouse); i++) {
-    if (checkOccupancy( & exampleSlot, & flagState, TRUE) == TRUE) {
-      idArray[i] = exampleSlot.lote.id;
-    }
-  }
-
-}
 
 /**
  * It takes an input number, and prints out the slot position of the number
@@ -421,16 +408,6 @@ int warehouseOccupancy() {
   return 0;
 }
 
-int checkId(int arrayWarehouse[], int ID) {
-  int i;
-  for (i = 0; i <= MAX_WAREHOUSE; i++) {
-    if (ID == arrayWarehouse[i]) {
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
 int positionConvertion(int valPositionStore, int coordenatesStore[2], bool isPositionToCoordinates) {
 
   if (isPositionToCoordinates == TRUE) {
@@ -512,11 +489,7 @@ void saveWarehouseToStruct(FILE * fp, SLOT structToStoreFile[MAX_WAREHOUSE]){
 }
 */
 
-void saveWarehouseToStruct(FILE * fp, SLOT structToStoreFile[MAX_WAREHOUSE]) {
-  int i = 0;
-  SLOT structBuffer;
-  while (fread( & structBuffer, sizeof(SLOT), 1, fp)) {
-    le_slot_completo( & structBuffer);//https://stackoverflow.com/questions/3988709/read-binary-data-from-file-into-a-struct
+
 /*por alguma razão não imprime os valores bem - parece que está a ler os valores mal - pode ter haver com o malloc*/
     /*
     structToStoreFile[i].flag =  structBuffer.flag;
@@ -527,25 +500,19 @@ void saveWarehouseToStruct(FILE * fp, SLOT structToStoreFile[MAX_WAREHOUSE]) {
     structToStoreFile[i].lote.type =  structBuffer.lote.type;
     */
 
-    i = i + 1;
-  }
-}
+
 
 int saveTrayToWarehouse() {
 
   FILE * fp;
   //SLOT exampleSlot;
   FILE * fpWarehouse = fopen("warehouse.dat", "rb+");
-
+  SLOT structBuffer;
+  char flagState;
   char inputTrayName[100];
   char strToReadInput[60];
 
-  int * arrayStoreWarehouseId; //perceber isto mesmo bem
-  arrayStoreWarehouseId = malloc(MAX_WAREHOUSE);
-  /*usei malloc pois com memoria fixa obtia valores grandes negativos e positivos. 
-  Com malloc reserva logo 500 e esses estaram a 0
-  Agora é possivel ver se os id
-  */
+
 
   int inputVar;
   char destinyVar[MAX_DESTINY_STR];
@@ -569,50 +536,55 @@ int saveTrayToWarehouse() {
     exit(1);
   }
 
-  saveWarehouseIdsToArray(arrayStoreWarehouseId, fpWarehouse);
-  /*Codigo teste para ver se array está bem preechida ou não
-  for (int j = 0; j <= 50; j++) {
-    if(arrayStoreWarehouseId[j] != 0){
-      printf("Value of index %d: %d\n\n", j, arrayStoreWarehouseId[j]);
-    }
-  }
-  */
 
-  /*
-  struct loteCompleto {
-    int id; //4 bytes
-    char destiny[MAX_DESTINY_STR]; //30 bytes
-    char date[MAX_DATE_STR]; //12 bytes
-    int quantity; //4 bytes
-    int type; //4 bytes
-  };
-  */
-  SLOT EXEMPLO;
-  EXEMPLO.flag = 1;
-  EXEMPLO.lote.id = 44;
-  strcpy(EXEMPLO.lote.date, "2022-07-12");
-  strcpy(EXEMPLO.lote.destiny, "LISBOA");
-  EXEMPLO.lote.quantity = 23;
-  EXEMPLO.lote.type = 1;
+  FILE * fpTest = fopen("warehouseNew.dat", "wb+");
 
-  //long int positionOne = 50;
-  //long int positionTwo = 70;
-
-  SLOT completeFile[MAX_WAREHOUSE];
-  saveWarehouseToStruct(fpWarehouse, completeFile);
-
-  /***************************************************************************/
-  //Zona de codigo a desenvolver
+  bool isRepeated;
   while (fgets(strToReadInput, sizeof(strToReadInput), fp)) { //&& fread( & exampleSlot, sizeof(SLOT), 1, fpWarehouse)
     sscanf(strToReadInput, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt);
 
-    if ((checkId(arrayStoreWarehouseId, inputVar))) {
-      printf("\nRepeated product Id: %d Discarting\n\n", inputVar);
-    } else {
+  for (int i = 0; fread( & structBuffer, sizeof(SLOT), 1, fpWarehouse); i++) {
+    if (checkOccupancy( & structBuffer, & flagState, TRUE) == TRUE) {//se estiver ocupado
+      if((structBuffer.lote.id) == inputVar){//tiver o mesmo ID
+        printf("\nRepeated product Id: %d Discarting\n\n", inputVar);
+        isRepeated = TRUE;
+        break;
+    }
+    }
+  }
 
+
+if(isRepeated == TRUE){
+  continue;
+}
+
+  /*while(fread( & structBuffer, sizeof(SLOT), 1, fpWarehouse)){
+      fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
+      if(structBuffer.flag == 0){
+        structBuffer.flag = 1;
+        structBuffer.lote.id = inputVar;
+        strcpy(structBuffer.lote.destiny, destinyVar);
+        strcpy(structBuffer.lote.date, dateVar);
+        structBuffer.lote.quantity = quantityVar;
+        structBuffer.lote.type = typeVarInt;
+
+        fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
+        break;//á aqui alguma coisa que falta. isto tem que ser continuo não pode parar porque encontrou um novo valor a escrever
+        //descareegra novos ficheiros tray.txt e warehouse.txt
+      }
+    }*/
     }
 
-  }
+  fclose(fp);
+  fclose(fpWarehouse);
+  fclose(fpTest);
+
+  return 0;
+}
+
+
+
+
   /*  O QUE FALTA FAZER? - ATE 6 FEIRA O TRABALHO TEM QUE ESTAR FEITO 
 
   coordenadas do tray - consegue-se a partir de uma constante que soma as posição em que vamos:
@@ -672,12 +644,7 @@ void print_NumToSlotPosition(int inputNum) {
   */
   /***************************************************************************/
 
-  free(arrayStoreWarehouseId);
-  fclose(fp);
-  fclose(fpWarehouse);
 
-  return 0;
-}
 /**
  * It prints a menu
  */
