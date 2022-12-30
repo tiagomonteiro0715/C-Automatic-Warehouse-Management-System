@@ -466,7 +466,6 @@ int saveTrayToWarehouse() {
 
     if (structBuffer.flag == 1) {
       fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
-      printf("\nWriting from warehouse");
     }
     
     if (structBuffer.flag == 0) {
@@ -480,15 +479,15 @@ int saveTrayToWarehouse() {
          isIdRepeated = isIdInWarehouse(filePtrWarehouse, trayItemInput.lote.id);
 
         if (isIdRepeated == 0) { //se o ID estiver no ficheiro
+          trayItemInput.flag=1;
           fwrite( &trayItemInput, sizeof(SLOT), 1, fpTest);
           printf("\nWriting from tray");
+          /*
+          Por aqui a posição de tray e coordenadas com / e %
+          
+          */
           break;
 
-          /*
-          Não usamos break aqui, pois assim esta posição fica livre para a proxima
-          linha do tray.txt entrar na warehouse caso o ID não esteja já anteriormente
-          na warehouse
-          */
         } 
           printf("\nRepeated product Id: %d Discarting", trayItemInput.lote.id);
           continue;
