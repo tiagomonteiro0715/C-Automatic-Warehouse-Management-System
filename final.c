@@ -256,7 +256,7 @@ int showTray(bool override) {
 int showCompleteBatch() {
 
   /* Opening the file warehouse.dat in binary mode for reading and writing. */
-  FILE * fp = fopen("warehouse1.dat", "rb+");
+  FILE * fp = fopen("warehouse3.dat", "rb+");
 
   SLOT slotExample;
   int countLine = 0;
@@ -420,40 +420,37 @@ int positionConvertion(int valPositionStore, int coordenatesStore[2], bool isPos
   return 0;
 }
 
-void isIdInWarehouse(FILE * filePtrWarehouse, int ID, int value) {
-  SLOT Buffer;
-  printf("\nRunning");
+int isIdInWarehouse(FILE * filePtrWarehouse, int ID) {
+  filePtrWarehouse = fopen("warehouse.dat", "rb+");
 
-  while (fread( & Buffer, sizeof(SLOT), 1, filePtrWarehouse)) {
-   printf("\nID value from warehouse: %d", Buffer.lote.id);
+  SLOT slotExample;
+  while (fread( & slotExample, sizeof(SLOT), 1, filePtrWarehouse)) {
 
-    if ((Buffer.lote.id) == ID) {
-      printf("\n\nID exists in warehouse\n\n");
-      value = 1;
-      break;
+    if ((slotExample.lote.id) == ID) {
+      return 1;
     }
   }
-
+  return 0;
 
 }
 
 int saveTrayToWarehouse() {
 
-  FILE * fp;
+  FILE * fpTray;
   FILE * filePtrWarehouse = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
+  SLOT trayItemInput;
   char inputTrayName[100];
   char strToReadInput[60];
   int isIdRepeated = 0;
-  SLOT trayItemInput;
 
   getchar(); // Para apanhar o [enter]
   printf("Tray Filename: ");
   scanf("%s", inputTrayName);
   printf("\n");
-  fp = fopen(inputTrayName, "r");
+  fpTray = fopen(inputTrayName, "r");
 
-  if (fp == NULL) {
+  if (fpTray == NULL) {
     printf("Error opening text file\n");
     exit(1);
   }
@@ -463,8 +460,8 @@ int saveTrayToWarehouse() {
     exit(1);
   }
 
-  FILE * fpTest = fopen("warehouse1.dat", "wb+");
-
+  FILE * fpTest;
+  fpTest = fopen("warehouse3.dat", "wb+");
   while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
 
     if (structBuffer.flag == 1) {
@@ -473,92 +470,35 @@ int saveTrayToWarehouse() {
     }
     
     if (structBuffer.flag == 0) {
-      while (fgets(strToReadInput, sizeof(strToReadInput), fp)) {
+      while (fgets(strToReadInput, sizeof(strToReadInput), fpTray)) {
         sscanf(strToReadInput, "%d %s %s %d %d", &
           trayItemInput.lote.id,
           trayItemInput.lote.destiny,
           trayItemInput.lote.date, &
           trayItemInput.lote.quantity, & trayItemInput.lote.type);
 
-          /*printf("\n\n%d %s %s %d %d", 
-          trayItemInput.lote.id,
-          trayItemInput.lote.destiny,
-          trayItemInput.lote.date, 
-          trayItemInput.lote.quantity,  trayItemInput.lote.type);*/
+         isIdRepeated = isIdInWarehouse(filePtrWarehouse, trayItemInput.lote.id);
 
-         isIdInWarehouse(filePtrWarehouse, trayItemInput.lote.id, isIdRepeated);
+        if (isIdRepeated == 0) { //se o ID estiver no ficheiro
+          fwrite( &trayItemInput, sizeof(SLOT), 1, fpTest);
+          printf("\nWriting from tray");
+          break;
 
-
-        if (isIdRepeated == 1) { //se o ID estiver no ficheiro
-          printf("\nRepeated product Id: %d Discarting", trayItemInput.lote.id);
-          continue;
           /*
           Não usamos break aqui, pois assim esta posição fica livre para a proxima
           linha do tray.txt entrar na warehouse caso o ID não esteja já anteriormente
           na warehouse
           */
         } 
-
-
-          fwrite( & trayItemInput, sizeof(SLOT), 1, fpTest);
-          printf("\nWriting from tray");
-          break;
-      
-
-
-      
+          printf("\nRepeated product Id: %d Discarting", trayItemInput.lote.id);
+          continue;
       }
     }
 
-    /*
-    int isIdRepeated = 0;
-
-    //fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
-
-    if ((structBuffer.lote.id) == inputVar) { //tiver o mesmo ID
-      repeatedIdArray[index] = inputVar; //adicionar que este ID já foi repetido
-      index = index + 1;
-      printf("\n0 - Repeated product Id: %d Discarting", inputVar);
-      break;
-
-    } else {
-      for (int i = 0; i < 10; i++) { //Para apanhar se ID já existiu numa iteração anterior
-        if (repeatedIdArray[i] == inputVar) {
-          isIdRepeated = 1;
-          printf("\n1 - Repeated product Id: %d Discarting", inputVar);
-          break;
-        }
-      }        
-    }
-
-      if(isIdRepeated == 0){
-        printf("\nNew value");
-        break;
-      }
-      if(isIdRepeated == 1){
-        isIdRepeated = 0;
-        break;
-      }
-      */
-    /*while(fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)){
-        if(structBuffer.flag == 0){
-          structBuffer.flag = 1;
-          structBuffer.lote.id = inputVar;
-          strcpy(structBuffer.lote.destiny, destinyVar);
-          strcpy(structBuffer.lote.date, dateVar);
-          structBuffer.lote.quantity = quantityVar;
-          structBuffer.lote.type = typeVarInt;
-
-          fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
-          break;//á aqui alguma coisa que falta. isto tem que ser continuo não pode parar porque encontrou um novo valor a escrever
-          //descareegra novos ficheiros tray.txt e warehouse.txt
-        }
-      }*/
   }
-
-  fclose(fp);
-  fclose(filePtrWarehouse);
   fclose(fpTest);
+  fclose(fpTray);
+  fclose(filePtrWarehouse);
 
   return 0;
 }
