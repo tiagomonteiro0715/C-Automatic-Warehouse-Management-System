@@ -20,6 +20,8 @@
 
 #define MAX_WAREHOUSE 500
 
+#define NUM_DISTRITOS_CONTINENTAL 17
+
 /****************************************************************
  *****************  Declaração de estruturas  *******************
  ****************************************************************/
@@ -434,6 +436,10 @@ int isIdInWarehouse(FILE * filePtrWarehouse, int ID) {
 
 }
 
+/*****************************************************************************************
+************************************13 - 16 valores***************************************
+******************************************************************************************/
+
 int saveTrayToWarehouse() {
 
   FILE * fpTray;
@@ -518,7 +524,7 @@ int swapBatch(){
   SLOT structBuffer;
 
   SLOT structChosen;
-  //SLOT structToDisplace;
+  SLOT structToDisplace;
 
   int i;
 
@@ -580,17 +586,99 @@ int swapBatch(){
 */
 
   for (i = 1;fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);i++) {
-  
+    if(structBuffer.lote.id == chosenPosition){
+     structToDisplace = structBuffer;
+     positionIdFound = i;
+     break;
+    }
   }
 
+  FILE * filePtrTest = fopen("warehouse.dat", "wb+");
+
+  for (i = 1;fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);i++) {
+    fwrite( & structBuffer, sizeof(SLOT), 1, filePtrTest);
+
+    if(i == chosenPosition){
+     fwrite( & structToDisplace, sizeof(SLOT), 1, filePtrTest);
+     continue;
+    }else if(i== positionIdFound){
+     fwrite( & structChosen, sizeof(SLOT), 1, filePtrTest);
+     continue;
+    }
+  }
 
   fclose(filePtrWarehouse);
+  fclose(filePtrTest);
+
   return 0;
+}
+/*****************************************************************************************
+************************************16 - 18 valores***************************************
+******************************************************************************************/
+
+/*
+struct loteCompleto {
+  int id; //4 bytes
+  char destiny[MAX_DESTINY_STR]; //30 bytes
+  char date[MAX_DATE_STR]; //12 bytes
+  int quantity; //4 bytes
+  int type; //4 bytes
+};
+*/
+
+typedef struct warehouseStatistics {
+  char destino[20];
+  int totalCartoes;
+  int totalLivretes;
+} CITYVALUES;
+
+int iswordInListStruct(FILE * filePtrWarehouse, char buffer[20]) {
+  filePtrWarehouse = fopen("warehouse.dat", "rb+");
+
+  SLOT slotExample;
+  while (fread( & slotExample, sizeof(SLOT), 1, filePtrWarehouse)) {
+
+    if (!(strcmp(buffer, slotExample.lote.destiny))) {
+      return 1;
+    }
+  }
+  return 0;
+
 }
 
 
 
+
+int estatisticas(){
+  FILE * filePtrWarehouse = fopen("warehouse.dat", "rb+");
+  SLOT structBuffer;
+  CITYVALUES destinos[NUM_DISTRITOS_CONTINENTAL];
+  char allLocations[500][20];//500 palavras, cada uma com 20 bytes
+
+
+  int word;
+
+  if (filePtrWarehouse == NULL) {
+    printf("Error opening binary file\n");
+    exit(1);
+  }
+
+  for (word=0; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); word++) {
+      printf("\n%s\n",structBuffer.lote.destiny);
+      if(!(isNull(structBuffer.lote.destiny))){
+         strcpy(destinos[word].destino, structBuffer.lote.destiny);
+      }
+
+
+}
+  fclose(filePtrWarehouse);
+
+  return 0;
+
+}
 /*  O QUE FALTA FAZER? - ATE 6 FEIRA O TRABALHO TEM QUE ESTAR FEITO 
+
+o máximo de asteriscos é 50 - pegar no valor maximo e dizer que isso é 50
 
 
     ESTATISTICAS
@@ -680,8 +768,11 @@ void choices() {
       showMenu();
       break;
     case '7':
+estatisticas();
+      showMenu();
       break;
     case '8':
+    
       break;
     case 'e':
       fclose(fp);
