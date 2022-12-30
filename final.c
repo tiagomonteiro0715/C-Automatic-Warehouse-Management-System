@@ -256,7 +256,7 @@ int showTray(bool override) {
 int showCompleteBatch() {
 
   /* Opening the file warehouse.dat in binary mode for reading and writing. */
-  FILE * fp = fopen("warehouse3.dat", "rb+");
+  FILE * fp = fopen("warehouse.dat", "rb+");
 
   SLOT slotExample;
   int countLine = 0;
@@ -460,12 +460,10 @@ int saveTrayToWarehouse() {
     exit(1);
   }
 
-  FILE * fpTest;
-  fpTest = fopen("warehouse3.dat", "wb+");
+  int countWhenWritten = 0;
   while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
-
     if (structBuffer.flag == 1) {
-      fwrite( & structBuffer, sizeof(SLOT), 1, fpTest);
+      fwrite( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);
     }
     
     if (structBuffer.flag == 0) {
@@ -478,62 +476,121 @@ int saveTrayToWarehouse() {
 
          isIdRepeated = isIdInWarehouse(filePtrWarehouse, trayItemInput.lote.id);
 
-        if (isIdRepeated == 0) { //se o ID estiver no ficheiro
+        if (isIdRepeated == 1) { //se o ID estiver no ficheiro
+          printf("\nRepeated product Id: %d Discarting", trayItemInput.lote.id);
+          continue;
+        } 
+
+        if (isIdRepeated == 0){ 
+          countWhenWritten += 1;
           trayItemInput.flag=1;
-          fwrite( &trayItemInput, sizeof(SLOT), 1, fpTest);
-          printf("\nWriting from tray");
+          fwrite( &trayItemInput, sizeof(SLOT), 1, filePtrWarehouse);
+          printf("\nId: %d Tray: %d %d -> Slot: %d %d %d",
+           trayItemInput.lote.id,
+           countWhenWritten/4,
+           countWhenWritten%4,
+           countWhenWritten/10,//row
+           countWhenWritten%10,//collum
+           countWhenWritten/100//Shelf
+          );
           /*
           Por aqui a posição de tray e coordenadas com / e %
           
           */
           break;
-
-        } 
-          printf("\nRepeated product Id: %d Discarting", trayItemInput.lote.id);
-          continue;
+        }
       }
+
+
     }
 
   }
-  fclose(fpTest);
   fclose(fpTray);
   fclose(filePtrWarehouse);
 
   return 0;
 }
 
-/*  O QUE FALTA FAZER? - ATE 6 FEIRA O TRABALHO TEM QUE ESTAR FEITO 
 
-  coordenadas do tray - consegue-se a partir de uma constante que soma as posição em que vamos:
+int swapBatch(){
 
-  Id: 1 tray: constante/4  constante%4 SLOT: (???proxima localização  livre acho eu???)
+  FILE * filePtrWarehouse = fopen("warehouse.dat", "rb+");
+  SLOT structBuffer;
 
-void print_NumToSlotPosition(int inputNum) {
-  inputNum = inputNum % 100;
-  int decimal = inputNum / 10;
-  int unit = inputNum % 10;
-  printf("\n Slot: %d %d", decimal, unit);
+  SLOT structChosen;
+  //SLOT structToDisplace;
+
+  int i;
+
+  int inputID = 0;
+  int inputRow = 0;
+  int inputCollum = 0;
+  int inputShelf = 0;
+
+  int chosenPosition = 0;  
+  int positionIdFound = 0;
+
+  if (filePtrWarehouse == NULL) {
+    printf("Error opening binary file\n");
+    exit(1);
+  }
+
+  printf("Id: ");
+  scanf("%d", &inputID);
+
+
+  if(isIdInWarehouse(filePtrWarehouse, inputID) == 0){
+    printf("Batch Id not stored in warehouse");
+    return 0;
+  }
+
+  printf("Row: ");
+  scanf("%d", &inputRow);
+
+  printf("Collum: ");
+  scanf("%d", &inputCollum);
+
+  printf("Shelf: ");
+  scanf("%d", &inputShelf);
+
+  chosenPosition = inputCollum + (inputRow*10) + (inputShelf*100);
+
+  if(chosenPosition > 500){
+    printf("\nSuch position does not exist in the warehouse");
+    return 0;
+  }
+
+  for (i = 1;fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);i++) {
+    if(structBuffer.lote.id == inputID){
+    structChosen = structBuffer;
+     positionIdFound = i;
+     break;
+    }
+  }
+  /*
+  printf("\n\n== Position found %d==\n\n", positionIdFound);
+
+  printf("%d %s %s %d %d",
+    structChosen.lote.id,
+    structBuffer.lote.destiny,
+    structBuffer.lote.date,
+    structBuffer.lote.quantity,
+    structBuffer.lote.type
+  );
+*/
+
+  for (i = 1;fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);i++) {
+  
+  }
+
+
+  fclose(filePtrWarehouse);
+  return 0;
 }
 
 
-  (???proxima localização  livre acho eu???) - converter posicao numaro em posicao coordenadas
 
-  posso usar a função (???proxima localização  livre acho eu???) ou não??
-
-  Acho que posso tenho é que ter um bool override para funcionar só neste caso
-
-  É melhor fazer uma função que receba um inteiro de onde vamos e converta para coordenadas.
-  Depois fazo nessa função bool override para a função:"troca lote de slot", onde tenho que converter coordenada em inteiro
-  Fazer função convert position(bool valToCoordenates)
-
-  usar função de saveWarehouseIdsToArray para obter os id e verificar se está lá ou não
-  MEsma função checkid e ignorar as posições a 0 com o if
-
-
-    int * arrayStoreWarehouseId;//perceber isto mesmo bem
-    arrayStoreWarehouseId = malloc(MAX_WAREHOUSE);
-
-    criar função que depois de correr um programa tenho que fazer enter para voltar ao menu
+/*  O QUE FALTA FAZER? - ATE 6 FEIRA O TRABALHO TEM QUE ESTAR FEITO 
 
 
     ESTATISTICAS
@@ -564,8 +621,10 @@ void print_NumToSlotPosition(int inputNum) {
 /**
  * It prints a menu
  */
-void showMenu() {
 
+
+void showMenu() {
+ 
   printf("\n\n1 - Show tray\n");
 
   printf("2 - Show batch info\n");
@@ -617,6 +676,8 @@ void choices() {
       showMenu();
       break;
     case '6':
+      swapBatch();
+      showMenu();
       break;
     case '7':
       break;
