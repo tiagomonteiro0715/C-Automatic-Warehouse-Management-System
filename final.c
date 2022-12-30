@@ -53,6 +53,10 @@ typedef struct slot {
   int flag; //0 - livre || 1 - ocupado
 }
 SLOT;
+
+int isnull(char *string){ 
+  return (strlen(string) == 0);
+}
 /****************************************************************
  *******  Declaração de funções de leitura de estruturas  *******
  ****************************************************************/
@@ -632,7 +636,7 @@ typedef struct warehouseStatistics {
   int totalLivretes;
 } CITYVALUES;
 
-int iswordInListStruct(FILE * filePtrWarehouse, char buffer[20]) {
+int iswordAlreadyInListStruct(FILE * filePtrWarehouse, char buffer[20]) {
   filePtrWarehouse = fopen("warehouse.dat", "rb+");
 
   SLOT slotExample;
@@ -664,8 +668,9 @@ int estatisticas(){
   }
 
   for (word=0; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); word++) {
-      printf("\n%s\n",structBuffer.lote.destiny);
-      if(!(isNull(structBuffer.lote.destiny))){
+      if(!(isnull(structBuffer.lote.destiny)) && (structBuffer.flag)){
+         printf("\n%s\n",structBuffer.lote.destiny);
+         //if(iswordAlreadyInListStruct(filePtrWarehouse, ))
          strcpy(destinos[word].destino, structBuffer.lote.destiny);
       }
 
@@ -676,35 +681,7 @@ int estatisticas(){
   return 0;
 
 }
-/*  O QUE FALTA FAZER? - ATE 6 FEIRA O TRABALHO TEM QUE ESTAR FEITO 
 
-o máximo de asteriscos é 50 - pegar no valor maximo e dizer que isso é 50
-
-
-    ESTATISTICAS
-    estrutura com cada cidade
-
-    struct cidade = {
-      Char cidade;
-      int cartao;
-      int livrete
-    }
-
-    cidade[10] - ir buscar numero de cidades em portugal
-
-    função que capte todas as cidades da wharehouse e crie uma array de structs co o tamanha do numero de todas as grandes cidades em portugal(pode ser conselhos)
-
-    Depois é facil é so criar duas funções para apresentar os valores:
-    uma para a tabela e outro com os asteriscos
-
-    No fim do trabalho:
-
-    1. Documentalo todo com mintligy
-    2. Ver se funciona o warehouseoccupy
-    3. por a funcionar na virtualbox
-    4. 2 feira - mandar trabalho ao professor e escolher logo a data
-  */
-/***************************************************************************/
 
 /**
  * It prints a menu
