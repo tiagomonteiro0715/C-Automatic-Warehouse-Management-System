@@ -636,88 +636,70 @@ typedef struct warehouseStatistics {
 }
 CITYVALUES;
 
-int addItems(FILE * filePtrWarehouse, CITYVALUES cityBuffer) {
-  filePtrWarehouse = fopen("warehouse.dat", "rb+");
-  int value = 0;
-
-  SLOT structBuffer;
-  while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
-    printf("\nWarehouse: %s -- Word to compare %s", structBuffer.lote.destiny, cityBuffer.destino);
-    if (!(strcmp(structBuffer.lote.destiny , cityBuffer.destino))) {
-      cityBuffer.apperances = cityBuffer.apperances + 1;
-      value = 1;
-      printf(" << word reached %d | Apperance: %d\n", value, cityBuffer.apperances);
-      break;
-    }
-  }
-  return value;
-
-}
-
 int estatisticas() {
   FILE * filePtrWarehouse = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
   CITYVALUES destinos[NUM_DISTRITOS_CONTINENTAL];
-
+  int i;
   int word;
+  char previousDestiny[12];
+
+  for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) { //inicializar
+    destinos[i].apperances = 0;
+    destinos[i].totalCartoes = 0;
+    destinos[i].totalLivretes = 0;
+  }
 
   if (filePtrWarehouse == NULL) {
     printf("Error opening binary file\n");
     exit(1);
   }
-
+  /*
+   *******************************************************
+   */
   for (word = 0; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); word++) {
     if (!(isnull(structBuffer.lote.destiny)) && (structBuffer.flag)) {
       destinos[word].ocupado = 1;
       strcpy(destinos[word].destino, structBuffer.lote.destiny);
 
-      addItems(filePtrWarehouse, destinos[word]);
+      if (!(strcmp(structBuffer.lote.destiny, destinos[word].destino))) {
+
+        strcpy(previousDestiny, destinos[word].destino);//tenho que trocar isto de prosição
+        destinos[word].apperances = destinos[word].apperances + 1;//é com estas duas coisas que tenho que fazer isto
+        //criar printf que diz quando funções estão a repetir
+
+        if (!(strcmp(structBuffer.lote.destiny, previousDestiny))) { //se for igual ao anterior
+
+         printf("\nWarehouse: %s -- Word to compare %s", structBuffer.lote.destiny, destinos[word].destino);
+
+          if (structBuffer.lote.type == 1) { //cartoes
+            destinos[word].totalCartoes = destinos[word].totalCartoes + structBuffer.lote.quantity;
+            continue;
+          }
+
+          if (structBuffer.lote.type == 2) { //livretes
+            destinos[word].totalLivretes = destinos[word].totalLivretes + structBuffer.lote.quantity;
+            continue;
+          }
+        }
+
+        break;
+      }
 
       printf("\n");
 
-      /*if (addItems(filePtrWarehouse, destinos[word].destino)) {
-        if (structBuffer.lote.type == 1) { //cartoes
-          destinos[word].totalCartoes = destinos[word].totalCartoes + structBuffer.lote.quantity;
-          continue;
-        }
+    }
 
-        if (structBuffer.lote.type == 2) { //livretes
-          destinos[word].totalLivretes = destinos[word].totalLivretes + structBuffer.lote.quantity;
-          continue;
+  }
 
-        }
+        printf("\n");
+
+    for(i=0; i<28; i++){
+      if(destinos[i].ocupado == 1){
+      printf("\n%s %d %d %d", destinos[i].destino, destinos[i].totalCartoes, destinos[i].totalLivretes, destinos[i].apperances);
       }
-
-
-      if (!(addItems(filePtrWarehouse, destinos[word].destino))) {
-        destinos[word].ocupado = 1;
-        strcpy(destinos[word].destino, structBuffer.lote.destiny);
-
-        if (structBuffer.lote.type == 1) { //cartoes
-          destinos[word].totalCartoes = destinos[word].totalCartoes + structBuffer.lote.quantity;
-          continue;
-
-        }
-        if (structBuffer.lote.type == 2) { //livretes
-          destinos[word].totalLivretes = destinos[word].totalLivretes + structBuffer.lote.quantity;
-          continue;
-
-        }
-      } */
-
-
     }
-
-  }
-
-/*
-  int i;
-  for(i=0; i<12; i++){
-    if(destinos[i].ocupado == 1){
-    printf("%s %d %d\n", destinos[i].destino, destinos[i].totalCartoes, destinos[i].totalLivretes);
-    }
-  }
-  */
+    
 
   fclose(filePtrWarehouse);
 
