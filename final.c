@@ -641,7 +641,6 @@ int estatisticas() {
   SLOT structBuffer;
   CITYVALUES destinos[NUM_DISTRITOS_CONTINENTAL];
   int i;
-  char previousDestiny[12];
 
   for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) { //inicializar
     destinos[i].apperances = 0;
@@ -653,47 +652,53 @@ int estatisticas() {
     printf("Error opening binary file\n");
     exit(1);
   }
-//----------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------------------------
   int index = 0;
-  while(fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
+  int isItRepeated;
+  int positionFound = 0;
+
+  while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
+    isItRepeated = 0;
+    if (structBuffer.flag == 0) {
+      continue;
+    }
     if (!(isnull(structBuffer.lote.destiny)) && (structBuffer.flag)) {
+
+      for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) {
+        if (!strcmp(destinos[i].destino, structBuffer.lote.destiny)) {
+          positionFound = i;
+          destinos[positionFound].apperances = destinos[positionFound].apperances + 1;
+
+          if (structBuffer.lote.type == 1) { //cartoes
+            destinos[positionFound].totalCartoes = destinos[positionFound].totalCartoes + structBuffer.lote.quantity;
+            isItRepeated = 1;
+            break;
+          }
+
+          if (structBuffer.lote.type == 2) { //livretes
+            destinos[positionFound].totalLivretes = destinos[positionFound].totalLivretes + structBuffer.lote.quantity;
+            isItRepeated = 1;
+            break;
+          }
+        }
+      }
+      if (isItRepeated == 1) {
+        continue;
+      }
+
       strcpy(destinos[index].destino, structBuffer.lote.destiny);
+      destinos[index].apperances = destinos[index].apperances + 1;
+      destinos[index].ocupado = 1;
 
-
-
-      if (!(strcmp(structBuffer.lote.destiny, previousDestiny))) { 
-        destinos[index].apperances = destinos[index].apperances + 1;
-
-        if (structBuffer.lote.type == 1) { //cartoes
-          destinos[index].totalCartoes = destinos[index].totalCartoes + structBuffer.lote.quantity;
-          continue;
-        }
-
-        if (structBuffer.lote.type == 2) { //livretes
-          destinos[index].totalLivretes = destinos[index].totalLivretes + structBuffer.lote.quantity;
-          continue;
-        }
+      if (structBuffer.lote.type == 1) { //cartoes
+        destinos[index].totalCartoes = destinos[index].totalCartoes + structBuffer.lote.quantity;
       }
 
-
-      if (!(strcmp(structBuffer.lote.destiny, destinos[index].destino))) { //ser for novo
-        strcpy(previousDestiny, structBuffer.lote.destiny);
-        destinos[index].apperances = destinos[index].apperances + 1;
-        destinos[index].ocupado = 1;
-        index = index + 1;
-
-        if (structBuffer.lote.type == 1) { //cartoes
-          destinos[index].totalCartoes = destinos[index].totalCartoes + structBuffer.lote.quantity;
-          continue;
-        }
-
-        if (structBuffer.lote.type == 2) { //livretes
-          destinos[index].totalLivretes = destinos[index].totalLivretes + structBuffer.lote.quantity;
-          continue;
-        }
+      if (structBuffer.lote.type == 2) { //livretes
+        destinos[index].totalLivretes = destinos[index].totalLivretes + structBuffer.lote.quantity;
       }
+      index = index + 1;
 
-      
     }
 
     printf("\n");
@@ -702,13 +707,13 @@ int estatisticas() {
 
   printf("\n");
 
-
-  for (i = 0; i < 28; i++) {
+/*
+  for (i = 0; i < 6; i++) {
     if (destinos[i].ocupado == 1) {
       printf("\n%s %d %d %d", destinos[i].destino, destinos[i].totalCartoes, destinos[i].totalLivretes, destinos[i].apperances);
     }
   }
-
+*/
 
 
   fclose(filePtrWarehouse);
