@@ -701,23 +701,46 @@ int estatisticas() {
 
     }
 
-    printf("\n");
 
   }
-
-  printf("\n");
-
-/*
-  for (i = 0; i < 6; i++) {
-    if (destinos[i].ocupado == 1) {
-      printf("\n%s %d %d %d", destinos[i].destino, destinos[i].totalCartoes, destinos[i].totalLivretes, destinos[i].apperances);
-    }
-  }
-*/
-
 
   fclose(filePtrWarehouse);
 
+  for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) {
+    if (destinos[i].ocupado == 1) {
+      printf("%-12s  Total: %-5d     Cartao: %-5d     Livrete: %d\n",
+      destinos[i].destino,
+      destinos[i].apperances, 
+      destinos[i].totalCartoes, 
+      destinos[i].totalLivretes);
+    }
+  }
+
+  int maxNumProduct = 0;
+  int currentTotalNumProduct = 0;
+
+  float histogramRatio = 0;
+
+  for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) {
+    if (destinos[i].ocupado == 1) {
+      currentTotalNumProduct = destinos[i].totalCartoes  + destinos[i].totalLivretes;
+      if(currentTotalNumProduct > maxNumProduct){
+          maxNumProduct = currentTotalNumProduct;
+      }
+    }
+  }
+  histogramRatio = (maxNumProduct / 50);
+
+  int j;
+  for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) {
+    if (destinos[i].ocupado == 1) {
+      currentTotalNumProduct = destinos[i].totalCartoes  + destinos[i].totalLivretes;
+      printf("\n%-10s  Quantidade total: %-5d    :", destinos[i].destino, currentTotalNumProduct);
+      for(j=0; j<(currentTotalNumProduct/histogramRatio);j++){
+        printf("*");
+      }
+    }
+  }
   return 0;
 
 }
