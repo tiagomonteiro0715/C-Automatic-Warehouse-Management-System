@@ -88,33 +88,11 @@ void convertNumToType(char * saveCharVar, int inputInt, bool fullText) {
 }
 
 /**
- * It prints the contents of a struct if the user input matches the struct's id
- * 
- * @param ptr pointer to the current slot
- * @param expectedUserInputId The id that the user inputted
- */
-void le_lote_pedido(SLOT * ptr, int expectedUserInputId) {
-  char ConvertedtypeName[MAX_TYPE_STR];
-
-  convertNumToType(ConvertedtypeName, ( * ptr).lote.type, TRUE);
-
-  if ((expectedUserInputId == ( * ptr).lote.id) && (( * ptr).flag == 1)) {
-    printf("\n\n=== Produto ===\n Id: %d\n Destination:%s\n Quantity:%d\n Type:%s\n Exp. Date:%s",
-      ( * ptr).lote.id,
-      ( * ptr).lote.destiny,
-      ( * ptr).lote.quantity,
-      ConvertedtypeName,
-      ( * ptr).lote.date
-    );
-  }
-}
-
-/**
  * It prints the contents of a SLOT structure
  * 
  * @param ptr pointer to the slot
  */
-void le_lote_completo(SLOT * ptr) {
+void leLote(SLOT * ptr) {
   printf("\n\n=== Produto ===\n Id: %d\n Destination:%s\n Quantity:%d\n Type:%d\n Exp. Date:%s",
     ( * ptr).lote.id,
     ( * ptr).lote.destiny,
@@ -125,23 +103,13 @@ void le_lote_completo(SLOT * ptr) {
 }
 
 /**
- * It reads a lot of data from the user, and then it reads a lot of data from the user
- * 
- * @param ptr a pointer to a SLOT struct
- * @param expectedUserInputId The expected user input id.
- */
-void le_slot_pedido(SLOT * ptr, int expectedUserInputId) {
-  le_lote_pedido(ptr, expectedUserInputId);
-}
-
-/**
  * It reads a complete slot, if the flag is 1
  * 
  * @param ptr pointer to the slot
  */
-void le_slot_completo(SLOT * ptr) {
+void leSlot(SLOT * ptr) {
   if (( * ptr).flag == 1) {
-    le_lote_completo(ptr);
+    leLote(ptr);
   }
 }
 
@@ -275,7 +243,7 @@ int showCompleteBatch() {
 
   /* Reading the binary file and printing the contents of the file. */
   while (fread( & structBuffer, sizeof(SLOT), 1, fp)) {
-    le_slot_completo( & structBuffer);
+    leSlot( & structBuffer);
 
     /* Counting the number of slots that are occupied in the warehouse. */
     countLine = countLine + 1;
@@ -321,15 +289,18 @@ int batchInfo() {
 
   /* Reading the file and printing the slot position and shelf number. */
   while (fread( & structBuffer, sizeof(SLOT), 1, fp)) {
-    le_slot_pedido( & structBuffer, userInputId);
-
-    /* Printing the shelf number and slot position. */
+    if(structBuffer.lote.id == userInputId){
+      leSlot(&structBuffer);
     countLine = countLine + 1;
     int Shelf = countLine / 100;
-    if ((structBuffer.flag == 1)) {
       print_NumToSlotPosition(countLine);
       printf(" Shelf: %d", Shelf);
+      break;
     }
+
+    /* Printing the shelf number and slot position. */
+
+    
   }
 
   fclose(fp);
