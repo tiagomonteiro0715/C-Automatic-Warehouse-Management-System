@@ -654,52 +654,54 @@ int estatisticas() {
     printf("Error opening binary file\n");
     exit(1);
   }
-  /*
-   *******************************************************
-   */
+
+  int index = 0;
   for (word = 0; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); word++) {
     if (!(isnull(structBuffer.lote.destiny)) && (structBuffer.flag)) {
-      destinos[word].ocupado = 1;
       strcpy(destinos[word].destino, structBuffer.lote.destiny);
 
-      if (!(strcmp(structBuffer.lote.destiny, destinos[word].destino))) {
+      if (!(strcmp(structBuffer.lote.destiny, previousDestiny))) { //se for igual ao anterior
+        /*é preciso uma variavei de index que aumente apenas quando houver uma nova cidade
+        ela seá a variavel que controlará a lista. Assim, não posso usar um for loop mesta parte do trabalho
+        pois a variavel i está ligada ao nº da linha a ler e não ao nº de cidades originais
+        */
+        destinos[word].apperances = destinos[word].apperances + 1;
 
-        strcpy(previousDestiny, destinos[word].destino);//tenho que trocar isto de prosição
-        destinos[word].apperances = destinos[word].apperances + 1;//é com estas duas coisas que tenho que fazer isto
-        //criar printf que diz quando funções estão a repetir
-
-        if (!(strcmp(structBuffer.lote.destiny, previousDestiny))) { //se for igual ao anterior
-
-         printf("\nWarehouse: %s -- Word to compare %s", structBuffer.lote.destiny, destinos[word].destino);
-
-          if (structBuffer.lote.type == 1) { //cartoes
-            destinos[word].totalCartoes = destinos[word].totalCartoes + structBuffer.lote.quantity;
-            continue;
-          }
-
-          if (structBuffer.lote.type == 2) { //livretes
-            destinos[word].totalLivretes = destinos[word].totalLivretes + structBuffer.lote.quantity;
-            continue;
-          }
-        }
-
-        break;
+        continue;
       }
 
-      printf("\n");
+      if (!(strcmp(structBuffer.lote.destiny, destinos[word].destino))) { //ser for novo
+        strcpy(previousDestiny, structBuffer.lote.destiny);
+        destinos[word].apperances = destinos[word].apperances + 1;
+        destinos[word].ocupado = 1;
+        index = index + 1;
+        printf("\nWarehouse: %s -- Word to compare %s", structBuffer.lote.destiny, destinos[word].destino);
 
+        if (structBuffer.lote.type == 1) { //cartoes
+          destinos[word].totalCartoes = destinos[word].totalCartoes + structBuffer.lote.quantity;
+          continue;
+        }
+
+        if (structBuffer.lote.type == 2) { //livretes
+          destinos[word].totalLivretes = destinos[word].totalLivretes + structBuffer.lote.quantity;
+          continue;
+        }
+      }
+
+      break;
     }
+
+    printf("\n");
 
   }
 
-        printf("\n");
+  printf("\n");
 
-    for(i=0; i<28; i++){
-      if(destinos[i].ocupado == 1){
+  for (i = 0; i < 28; i++) {
+    if (destinos[i].ocupado == 1) {
       printf("\n%s %d %d %d", destinos[i].destino, destinos[i].totalCartoes, destinos[i].totalLivretes, destinos[i].apperances);
-      }
     }
-    
+  }
 
   fclose(filePtrWarehouse);
 
