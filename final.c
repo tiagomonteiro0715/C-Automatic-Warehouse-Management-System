@@ -54,7 +54,7 @@ typedef struct slot {
 }
 SLOT;
 
-int isnull(char *string){ 
+int isnull(char * string) {
   return (strlen(string) == 0);
 }
 /****************************************************************
@@ -264,7 +264,7 @@ int showCompleteBatch() {
   /* Opening the file warehouse.dat in binary mode for reading and writing. */
   FILE * fp = fopen("warehouse.dat", "rb+");
 
-  SLOT slotExample;
+  SLOT structBuffer;
   int countLine = 0;
 
   /* Checking if the file is open. If it is not, it prints an error message and exits the program. */
@@ -274,15 +274,15 @@ int showCompleteBatch() {
   }
 
   /* Reading the binary file and printing the contents of the file. */
-  while (fread( & slotExample, sizeof(SLOT), 1, fp)) {
-    le_slot_completo( & slotExample);
+  while (fread( & structBuffer, sizeof(SLOT), 1, fp)) {
+    le_slot_completo( & structBuffer);
 
     /* Counting the number of slots that are occupied in the warehouse. */
     countLine = countLine + 1;
     int Shelf = countLine / 100;
 
     /* Printing the slot position and the shelf number in the warehouse */
-    if ((slotExample.flag == 1)) {
+    if ((structBuffer.flag == 1)) {
       print_NumToSlotPosition(countLine);
       printf(" Shelf: %d", Shelf);
     }
@@ -304,7 +304,7 @@ int batchInfo() {
   /* Opening the file warehouse.dat in binary mode for reading and writing. */
   FILE * fp = fopen("warehouse.dat", "rb+");
 
-  SLOT slotExample;
+  SLOT structBuffer;
   int userInputId;
   int countLine = 0;
 
@@ -320,13 +320,13 @@ int batchInfo() {
   }
 
   /* Reading the file and printing the slot position and shelf number. */
-  while (fread( & slotExample, sizeof(SLOT), 1, fp)) {
-    le_slot_pedido( & slotExample, userInputId);
+  while (fread( & structBuffer, sizeof(SLOT), 1, fp)) {
+    le_slot_pedido( & structBuffer, userInputId);
 
     /* Printing the shelf number and slot position. */
     countLine = countLine + 1;
     int Shelf = countLine / 100;
-    if ((slotExample.flag == 1)) {
+    if ((structBuffer.flag == 1)) {
       print_NumToSlotPosition(countLine);
       printf(" Shelf: %d", Shelf);
     }
@@ -337,7 +337,7 @@ int batchInfo() {
   return 0;
 }
 
-void printInputShelf(FILE * fp, SLOT slotExample, int inputShelf, char inputStoreTempVar) {
+void printInputShelf(FILE * fp, SLOT structBuffer, int inputShelf, char inputStoreTempVar) {
   int printCurrentLine = 0;
   int countAllCharParser;
   //int currentShelf;
@@ -345,7 +345,7 @@ void printInputShelf(FILE * fp, SLOT slotExample, int inputShelf, char inputStor
   printf("\n\n -----WAREHOUSE-----\n");
   printf(" 0 1 2 3 4 5 6 7 8 9");
 
-  for (countAllCharParser = 0; fread( & slotExample, sizeof(SLOT), 1, fp); countAllCharParser++) {
+  for (countAllCharParser = 0; fread( & structBuffer, sizeof(SLOT), 1, fp); countAllCharParser++) {
     if (!(countAllCharParser % 9 && (countAllCharParser != 0))) {
       /*if (currentShelf == inputShelf) {
         printf("\n %d ", (printCurrentLine % 10));
@@ -354,7 +354,7 @@ void printInputShelf(FILE * fp, SLOT slotExample, int inputShelf, char inputStor
       printCurrentLine += 1;
     }
 
-    checkOccupancy( & slotExample, & inputStoreTempVar, FALSE);
+    checkOccupancy( & structBuffer, & inputStoreTempVar, FALSE);
     /*if (currentShelf == inputShelf) {
       printf("%c ", inputStoreTempVar);
     }*/
@@ -372,7 +372,7 @@ int warehouseOccupancy() {
 
   /* Opening the file warehouse.dat in binary mode for reading and writing. */
   FILE * fp = fopen("warehouse.dat", "rb+");
-  SLOT slotExample;
+  SLOT structBuffer;
 
   /* Declaring the variables that will be used in the program. */
   char inputStoreTemp = ' ';
@@ -391,23 +391,23 @@ int warehouseOccupancy() {
 
   switch (userInputIntShelf) {
   case 0: //fazer função para isto tudo. usar   int shelf = printCurrentLine/10
-    printInputShelf(fp, slotExample, userInputIntShelf, inputStoreTemp);
+    printInputShelf(fp, structBuffer, userInputIntShelf, inputStoreTemp);
     break;
 
   case 1:
-    printInputShelf(fp, slotExample, userInputIntShelf, inputStoreTemp);
+    printInputShelf(fp, structBuffer, userInputIntShelf, inputStoreTemp);
     break;
 
   case 2:
-    printInputShelf(fp, slotExample, userInputIntShelf, inputStoreTemp);
+    printInputShelf(fp, structBuffer, userInputIntShelf, inputStoreTemp);
     break;
 
   case 3:
-    printInputShelf(fp, slotExample, userInputIntShelf, inputStoreTemp);
+    printInputShelf(fp, structBuffer, userInputIntShelf, inputStoreTemp);
     break;
 
   case 4:
-    printInputShelf(fp, slotExample, userInputIntShelf, inputStoreTemp);
+    printInputShelf(fp, structBuffer, userInputIntShelf, inputStoreTemp);
     break;
   }
   return 0;
@@ -429,10 +429,10 @@ int positionConvertion(int valPositionStore, int coordenatesStore[2], bool isPos
 int isIdInWarehouse(FILE * filePtrWarehouse, int ID) {
   filePtrWarehouse = fopen("warehouse.dat", "rb+");
 
-  SLOT slotExample;
-  while (fread( & slotExample, sizeof(SLOT), 1, filePtrWarehouse)) {
+  SLOT structBuffer;
+  while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
 
-    if ((slotExample.lote.id) == ID) {
+    if ((structBuffer.lote.id) == ID) {
       return 1;
     }
   }
@@ -441,8 +441,8 @@ int isIdInWarehouse(FILE * filePtrWarehouse, int ID) {
 }
 
 /*****************************************************************************************
-************************************13 - 16 valores***************************************
-******************************************************************************************/
+ ************************************13 - 16 valores***************************************
+ ******************************************************************************************/
 
 int saveTrayToWarehouse() {
 
@@ -475,7 +475,7 @@ int saveTrayToWarehouse() {
     if (structBuffer.flag == 1) {
       fwrite( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);
     }
-    
+
     if (structBuffer.flag == 0) {
       while (fgets(strToReadInput, sizeof(strToReadInput), fpTray)) {
         sscanf(strToReadInput, "%d %s %s %d %d", &
@@ -484,24 +484,24 @@ int saveTrayToWarehouse() {
           trayItemInput.lote.date, &
           trayItemInput.lote.quantity, & trayItemInput.lote.type);
 
-         isIdRepeated = isIdInWarehouse(filePtrWarehouse, trayItemInput.lote.id);
+        isIdRepeated = isIdInWarehouse(filePtrWarehouse, trayItemInput.lote.id);
 
         if (isIdRepeated == 1) { //se o ID estiver no ficheiro
           printf("\nRepeated product Id: %d Discarting", trayItemInput.lote.id);
           continue;
-        } 
+        }
 
-        if (isIdRepeated == 0){ 
+        if (isIdRepeated == 0) {
           countWhenWritten += 1;
-          trayItemInput.flag=1;
-          fwrite( &trayItemInput, sizeof(SLOT), 1, filePtrWarehouse);
+          trayItemInput.flag = 1;
+          fwrite( & trayItemInput, sizeof(SLOT), 1, filePtrWarehouse);
           printf("\nId: %d Tray: %d %d -> Slot: %d %d %d",
-           trayItemInput.lote.id,
-           countWhenWritten/4,
-           countWhenWritten%4,
-           countWhenWritten/10,//row
-           countWhenWritten%10,//collum
-           countWhenWritten/100//Shelf
+            trayItemInput.lote.id,
+            countWhenWritten / 4,
+            countWhenWritten % 4,
+            countWhenWritten / 10, //row
+            countWhenWritten % 10, //collum
+            countWhenWritten / 100 //Shelf
           );
           /*
           Por aqui a posição de tray e coordenadas com / e %
@@ -510,7 +510,6 @@ int saveTrayToWarehouse() {
           break;
         }
       }
-
 
     }
 
@@ -521,8 +520,7 @@ int saveTrayToWarehouse() {
   return 0;
 }
 
-
-int swapBatch(){
+int swapBatch() {
 
   FILE * filePtrWarehouse = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
@@ -537,7 +535,7 @@ int swapBatch(){
   int inputCollum = 0;
   int inputShelf = 0;
 
-  int chosenPosition = 0;  
+  int chosenPosition = 0;
   int positionIdFound = 0;
 
   if (filePtrWarehouse == NULL) {
@@ -546,35 +544,34 @@ int swapBatch(){
   }
 
   printf("Id: ");
-  scanf("%d", &inputID);
+  scanf("%d", & inputID);
 
-
-  if(isIdInWarehouse(filePtrWarehouse, inputID) == 0){
+  if (isIdInWarehouse(filePtrWarehouse, inputID) == 0) {
     printf("Batch Id not stored in warehouse");
     return 0;
   }
 
   printf("Row: ");
-  scanf("%d", &inputRow);
+  scanf("%d", & inputRow);
 
   printf("Collum: ");
-  scanf("%d", &inputCollum);
+  scanf("%d", & inputCollum);
 
   printf("Shelf: ");
-  scanf("%d", &inputShelf);
+  scanf("%d", & inputShelf);
 
-  chosenPosition = inputCollum + (inputRow*10) + (inputShelf*100);
+  chosenPosition = inputCollum + (inputRow * 10) + (inputShelf * 100);
 
-  if(chosenPosition > 500){
+  if (chosenPosition > 500) {
     printf("\nSuch position does not exist in the warehouse");
     return 0;
   }
 
-  for (i = 1;fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);i++) {
-    if(structBuffer.lote.id == inputID){
-    structChosen = structBuffer;
-     positionIdFound = i;
-     break;
+  for (i = 1; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
+    if (structBuffer.lote.id == inputID) {
+      structChosen = structBuffer;
+      positionIdFound = i;
+      break;
     }
   }
   /*
@@ -589,25 +586,25 @@ int swapBatch(){
   );
 */
 
-  for (i = 1;fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);i++) {
-    if(structBuffer.lote.id == chosenPosition){
-     structToDisplace = structBuffer;
-     positionIdFound = i;
-     break;
+  for (i = 1; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
+    if (structBuffer.lote.id == chosenPosition) {
+      structToDisplace = structBuffer;
+      positionIdFound = i;
+      break;
     }
   }
 
   FILE * filePtrTest = fopen("warehouse.dat", "wb+");
 
-  for (i = 1;fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);i++) {
+  for (i = 1; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
     fwrite( & structBuffer, sizeof(SLOT), 1, filePtrTest);
 
-    if(i == chosenPosition){
-     fwrite( & structToDisplace, sizeof(SLOT), 1, filePtrTest);
-     continue;
-    }else if(i== positionIdFound){
-     fwrite( & structChosen, sizeof(SLOT), 1, filePtrTest);
-     continue;
+    if (i == chosenPosition) {
+      fwrite( & structToDisplace, sizeof(SLOT), 1, filePtrTest);
+      continue;
+    } else if (i == positionIdFound) {
+      fwrite( & structChosen, sizeof(SLOT), 1, filePtrTest);
+      continue;
     }
   }
 
@@ -617,8 +614,8 @@ int swapBatch(){
   return 0;
 }
 /*****************************************************************************************
-************************************16 - 18 valores***************************************
-******************************************************************************************/
+ ************************************16 - 18 valores***************************************
+ ******************************************************************************************/
 
 /*
 struct loteCompleto {
@@ -631,34 +628,36 @@ struct loteCompleto {
 */
 
 typedef struct warehouseStatistics {
-  char destino[20];
   int totalCartoes;
   int totalLivretes;
-} CITYVALUES;
+  int ocupado;
+  int apperances;
+  char destino[12];
+}
+CITYVALUES;
 
-int iswordAlreadyInListStruct(FILE * filePtrWarehouse, char buffer[20]) {
+int addItems(FILE * filePtrWarehouse, CITYVALUES cityBuffer) {
   filePtrWarehouse = fopen("warehouse.dat", "rb+");
+  int value = 0;
 
-  SLOT slotExample;
-  while (fread( & slotExample, sizeof(SLOT), 1, filePtrWarehouse)) {
-
-    if (!(strcmp(buffer, slotExample.lote.destiny))) {
-      return 1;
+  SLOT structBuffer;
+  while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
+    printf("\nWarehouse: %s -- Word to compare %s", structBuffer.lote.destiny, cityBuffer.destino);
+    if (!(strcmp(structBuffer.lote.destiny , cityBuffer.destino))) {
+      cityBuffer.apperances = cityBuffer.apperances + 1;
+      value = 1;
+      printf(" << word reached %d | Apperance: %d\n", value, cityBuffer.apperances);
+      break;
     }
   }
-  return 0;
+  return value;
 
 }
 
-
-
-
-int estatisticas(){
+int estatisticas() {
   FILE * filePtrWarehouse = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
   CITYVALUES destinos[NUM_DISTRITOS_CONTINENTAL];
-  char allLocations[500][20];//500 palavras, cada uma com 20 bytes
-
 
   int word;
 
@@ -667,29 +666,71 @@ int estatisticas(){
     exit(1);
   }
 
-  for (word=0; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); word++) {
-      if(!(isnull(structBuffer.lote.destiny)) && (structBuffer.flag)){
-         printf("\n%s\n",structBuffer.lote.destiny);
-         //if(iswordAlreadyInListStruct(filePtrWarehouse, ))
-         strcpy(destinos[word].destino, structBuffer.lote.destiny);
+  for (word = 0; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); word++) {
+    if (!(isnull(structBuffer.lote.destiny)) && (structBuffer.flag)) {
+      destinos[word].ocupado = 1;
+      strcpy(destinos[word].destino, structBuffer.lote.destiny);
+
+      addItems(filePtrWarehouse, destinos[word]);
+
+      printf("\n");
+
+      /*if (addItems(filePtrWarehouse, destinos[word].destino)) {
+        if (structBuffer.lote.type == 1) { //cartoes
+          destinos[word].totalCartoes = destinos[word].totalCartoes + structBuffer.lote.quantity;
+          continue;
+        }
+
+        if (structBuffer.lote.type == 2) { //livretes
+          destinos[word].totalLivretes = destinos[word].totalLivretes + structBuffer.lote.quantity;
+          continue;
+
+        }
       }
 
 
-}
+      if (!(addItems(filePtrWarehouse, destinos[word].destino))) {
+        destinos[word].ocupado = 1;
+        strcpy(destinos[word].destino, structBuffer.lote.destiny);
+
+        if (structBuffer.lote.type == 1) { //cartoes
+          destinos[word].totalCartoes = destinos[word].totalCartoes + structBuffer.lote.quantity;
+          continue;
+
+        }
+        if (structBuffer.lote.type == 2) { //livretes
+          destinos[word].totalLivretes = destinos[word].totalLivretes + structBuffer.lote.quantity;
+          continue;
+
+        }
+      } */
+
+
+    }
+
+  }
+
+/*
+  int i;
+  for(i=0; i<12; i++){
+    if(destinos[i].ocupado == 1){
+    printf("%s %d %d\n", destinos[i].destino, destinos[i].totalCartoes, destinos[i].totalLivretes);
+    }
+  }
+  */
+
   fclose(filePtrWarehouse);
 
   return 0;
 
 }
 
-
 /**
  * It prints a menu
  */
 
-
 void showMenu() {
- 
+
   printf("\n\n1 - Show tray\n");
 
   printf("2 - Show batch info\n");
@@ -745,11 +786,11 @@ void choices() {
       showMenu();
       break;
     case '7':
-estatisticas();
+      estatisticas();
       showMenu();
       break;
     case '8':
-    
+
       break;
     case 'e':
       fclose(fp);
