@@ -12,13 +12,6 @@
 
 #define MAX_DESTINY_STR 30
 #define MAX_DATE_STR 12
-#define MAX_TYPE_STR 10
-
-#define NUM_TABULEIRO 4
-#define NUM_PRATELEIRAS 4
-#define LATERAL_SIZE 9
-
-#define MAX_WAREHOUSE 500
 
 #define NUM_DISTRITOS_CONTINENTAL 17
 
@@ -123,25 +116,14 @@ void leSlot(SLOT * ptr) {
  * 
  * @return the value of the flag variable in the slot structure.
  */
-int checkOccupancy(SLOT * ptr, char * inputFlagState, bool giveBoolVal) {
-  if (giveBoolVal == FALSE) {
-    if (( * ptr).flag == 0) {
-      strcpy(inputFlagState, ".");
-    }
-    if (( * ptr).flag == 1) {
-      strcpy(inputFlagState, "X");
-    }
+int checkOccupancy(SLOT * ptr, char * inputFlagState) {
+  if (( * ptr).flag == 0) {
+    strcpy(inputFlagState, ".");
+  }
+  if (( * ptr).flag == 1) {
+    strcpy(inputFlagState, "X");
   }
 
-  if (giveBoolVal == TRUE) {
-    if (( * ptr).flag == 0) {
-      return FALSE;
-    }
-    if (( * ptr).flag == 1) {
-      return TRUE;
-    }
-
-  }
   return 0;
 }
 
@@ -169,7 +151,9 @@ void print_NumToSlotPosition(int inputNum) {
  * @return the value 0.
  */
 int showTray(bool override) {
-  FILE * fp;
+
+  FILE * filePtr;
+
   char inputTrayName[100];
   char strToReadInput[60];
   int countLoop = 0;
@@ -181,6 +165,7 @@ int showTray(bool override) {
 
   int typeVarInt;
   char typeVarChar;
+
   /* Checking if the user inputted a file name, and if the user did not input a file name, it will open
   the file "tray.txt" */
   if (override == FALSE) {
@@ -188,19 +173,19 @@ int showTray(bool override) {
     printf("Filename: ");
     scanf("%s", inputTrayName);
     printf("\n");
-    fp = fopen(inputTrayName, "r");
+    filePtr = fopen(inputTrayName, "r");
   } else {
-    fp = fopen("tray.txt", "r");
+    filePtr = fopen("tray.txt", "r");
   }
 
   /* Checking if the file is open. If it is not, it prints an error message and exits the program. */
-  if (fp == NULL) {
+  if (filePtr == NULL) {
     printf("Error opening text file\n");
-    exit(1);
+    return 0;
   }
 
   /* Reading a file and printing the contents of the file. */
-  while (fgets(strToReadInput, sizeof(strToReadInput), fp)) {
+  while (fgets(strToReadInput, sizeof(strToReadInput), filePtr)) {
     sscanf(strToReadInput, "%d %s %s %d %d", & inputVar, destinyVar, dateVar, & quantityVar, & typeVarInt);
 
     /* Printing a new line every 4 lines. */
@@ -216,7 +201,7 @@ int showTray(bool override) {
     countLoop += 1;
   }
 
-  fclose(fp);
+  fclose(filePtr);
   return 0;
 
 }
@@ -230,19 +215,19 @@ int showTray(bool override) {
 int showCompleteBatch() {
 
   /* Opening the file warehouse.dat in binary mode for reading and writing. */
-  FILE * fp = fopen("warehouse.dat", "rb+");
-
+  FILE * filePtr = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
+
   int countLine = 0;
 
   /* Checking if the file is open. If it is not, it prints an error message and exits the program. */
-  if (fp == NULL) {
+  if (filePtr == NULL) {
     printf("Error opening binary file\n");
-    exit(1);
+    return 0;
   }
 
   /* Reading the binary file and printing the contents of the file. */
-  while (fread( & structBuffer, sizeof(SLOT), 1, fp)) {
+  while (fread( & structBuffer, sizeof(SLOT), 1, filePtr)) {
     leSlot( & structBuffer);
 
     /* Counting the number of slots that are occupied in the warehouse. */
@@ -257,7 +242,7 @@ int showCompleteBatch() {
 
   }
 
-  fclose(fp);
+  fclose(filePtr);
 
   return 0;
 }
@@ -270,9 +255,9 @@ int showCompleteBatch() {
 int batchInfo() {
 
   /* Opening the file warehouse.dat in binary mode for reading and writing. */
-  FILE * fp = fopen("warehouse.dat", "rb+");
-
+  FILE * filePtr = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
+
   int userInputId;
   int countLine = 0;
 
@@ -282,55 +267,57 @@ int batchInfo() {
   getchar();
 
   /* Opening a file and checking if it is NULL. If it is NULL, it will print an error message and exit. */
-  if (fp == NULL) {
+  if (filePtr == NULL) {
     printf("Error opening binary file\n");
-    exit(1);
+    return 0;
   }
 
   /* Reading the file and printing the slot position and shelf number. */
-  while (fread( & structBuffer, sizeof(SLOT), 1, fp)) {
-    if(structBuffer.lote.id == userInputId){
-      leSlot(&structBuffer);
-    countLine = countLine + 1;
-    int Shelf = countLine / 100;
+  while (fread( & structBuffer, sizeof(SLOT), 1, filePtr)) {
+    if (structBuffer.lote.id == userInputId) {
+      leSlot( & structBuffer);
+
+      countLine = countLine + 1;
+      int Shelf = countLine / 100;
+
       print_NumToSlotPosition(countLine);
       printf(" Shelf: %d", Shelf);
+
       break;
     }
 
     /* Printing the shelf number and slot position. */
 
-    
   }
 
-  fclose(fp);
+  fclose(filePtr);
 
   return 0;
 }
 
-void printInputShelf(FILE * fp, SLOT structBuffer, int inputShelf, char inputStoreTempVar) {
+void printInputShelf(FILE * filePtr, SLOT structBuffer, int inputShelf, char inputStoreTempVar) {
   int printCurrentLine = 0;
   int countAllCharParser;
-  //int currentShelf;
+  int currentShelf;
 
   printf("\n\n -----WAREHOUSE-----\n");
-  printf(" 0 1 2 3 4 5 6 7 8 9");
+  printf(" 0 1 2 3 4 5 6 7 8 9\n");
 
-  for (countAllCharParser = 0; fread( & structBuffer, sizeof(SLOT), 1, fp); countAllCharParser++) {
+  for (countAllCharParser = 0; fread( & structBuffer, sizeof(SLOT), 1, filePtr); countAllCharParser++) {
     if (!(countAllCharParser % 9 && (countAllCharParser != 0))) {
-      /*if (currentShelf == inputShelf) {
-        printf("\n %d ", (printCurrentLine % 10));
-      }*/
-      printf("\n %d ", (printCurrentLine)); //% 10
+      if (currentShelf == inputShelf) {
+        printf(" %d ", (printCurrentLine % 10));
+      }
+      //printf("\n %d ", (printCurrentLine)); //% 10
       printCurrentLine += 1;
     }
 
-    checkOccupancy( & structBuffer, & inputStoreTempVar, FALSE);
-    /*if (currentShelf == inputShelf) {
+    checkOccupancy( & structBuffer, & inputStoreTempVar);
+    if (currentShelf == inputShelf) {
       printf("%c ", inputStoreTempVar);
-    }*/
-    printf("%c ", inputStoreTempVar);
-    //currentShelf = printCurrentLine / 10;
+    }
+    //printf("%c ", inputStoreTempVar);
+    currentShelf = printCurrentLine / 10;
   }
 }
 
@@ -342,7 +329,7 @@ void printInputShelf(FILE * fp, SLOT structBuffer, int inputShelf, char inputSto
 int warehouseOccupancy() {
 
   /* Opening the file warehouse.dat in binary mode for reading and writing. */
-  FILE * fp = fopen("warehouse.dat", "rb+");
+  FILE * filePtr = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
 
   /* Declaring the variables that will be used in the program. */
@@ -355,47 +342,40 @@ int warehouseOccupancy() {
   getchar();
 
   /* Opening a file and checking if it is NULL. If it is NULL, it will print an error message and exit. */
-  if (fp == NULL) {
+  if (filePtr == NULL) {
     printf("Error opening binary file\n");
-    exit(1);
+    return 0;
   }
 
   switch (userInputIntShelf) {
   case 0: //fazer função para isto tudo. usar   int shelf = printCurrentLine/10
-    printInputShelf(fp, structBuffer, userInputIntShelf, inputStoreTemp);
+    printInputShelf(filePtr, structBuffer, userInputIntShelf, inputStoreTemp);
     break;
 
   case 1:
-    printInputShelf(fp, structBuffer, userInputIntShelf, inputStoreTemp);
+    printInputShelf(filePtr, structBuffer, userInputIntShelf, inputStoreTemp);
     break;
 
   case 2:
-    printInputShelf(fp, structBuffer, userInputIntShelf, inputStoreTemp);
+    printInputShelf(filePtr, structBuffer, userInputIntShelf, inputStoreTemp);
     break;
 
   case 3:
-    printInputShelf(fp, structBuffer, userInputIntShelf, inputStoreTemp);
+    printInputShelf(filePtr, structBuffer, userInputIntShelf, inputStoreTemp);
     break;
 
   case 4:
-    printInputShelf(fp, structBuffer, userInputIntShelf, inputStoreTemp);
+    printInputShelf(filePtr, structBuffer, userInputIntShelf, inputStoreTemp);
     break;
   }
   return 0;
 }
 
-int positionConvertion(int valPositionStore, int coordenatesStore[2], bool isPositionToCoordinates) {
 
-  if (isPositionToCoordinates == TRUE) {
-    return 0;
-  }
 
-  if (isPositionToCoordinates == FALSE) {
-
-    return valPositionStore;
-  }
-  return 0;
-}
+/*****************************************************************************************
+ ************************************13 - 16 valores***************************************
+ ******************************************************************************************/
 
 int isIdInWarehouse(FILE * filePtrWarehouse, int ID) {
   filePtrWarehouse = fopen("warehouse.dat", "rb+");
@@ -411,16 +391,13 @@ int isIdInWarehouse(FILE * filePtrWarehouse, int ID) {
 
 }
 
-/*****************************************************************************************
- ************************************13 - 16 valores***************************************
- ******************************************************************************************/
-
 int saveTrayToWarehouse() {
 
   FILE * fpTray;
   FILE * filePtrWarehouse = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
   SLOT trayItemInput;
+
   char inputTrayName[100];
   char strToReadInput[60];
   int isIdRepeated = 0;
@@ -433,55 +410,51 @@ int saveTrayToWarehouse() {
 
   if (fpTray == NULL) {
     printf("Error opening text file\n");
-    exit(1);
+    return 0;
   }
 
   if (filePtrWarehouse == NULL) {
     printf("Error opening binary file\n");
-    exit(1);
+    return 0;
   }
 
   int countWhenWritten = 0;
   while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
     if (structBuffer.flag == 1) {
       fwrite( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);
+      continue;
     }
 
-    if (structBuffer.flag == 0) {
-      while (fgets(strToReadInput, sizeof(strToReadInput), fpTray)) {
-        sscanf(strToReadInput, "%d %s %s %d %d", &
-          trayItemInput.lote.id,
-          trayItemInput.lote.destiny,
-          trayItemInput.lote.date, &
-          trayItemInput.lote.quantity, & trayItemInput.lote.type);
+    while (fgets(strToReadInput, sizeof(strToReadInput), fpTray)) {
 
-        isIdRepeated = isIdInWarehouse(filePtrWarehouse, trayItemInput.lote.id);
+      sscanf(strToReadInput, "%d %s %s %d %d", &
+        trayItemInput.lote.id,
+        trayItemInput.lote.destiny,
+        trayItemInput.lote.date, &
+        trayItemInput.lote.quantity, & trayItemInput.lote.type);
 
-        if (isIdRepeated == 1) { //se o ID estiver no ficheiro
-          printf("\nRepeated product Id: %d Discarting", trayItemInput.lote.id);
-          continue;
-        }
+      isIdRepeated = isIdInWarehouse(filePtrWarehouse, trayItemInput.lote.id);
 
-        if (isIdRepeated == 0) {
-          countWhenWritten += 1;
-          trayItemInput.flag = 1;
-          fwrite( & trayItemInput, sizeof(SLOT), 1, filePtrWarehouse);
-          printf("\nId: %d Tray: %d %d -> Slot: %d %d %d",
-            trayItemInput.lote.id,
-            countWhenWritten / 4,
-            countWhenWritten % 4,
-            countWhenWritten / 10, //row
-            countWhenWritten % 10, //collum
-            countWhenWritten / 100 //Shelf
-          );
-          /*
-          Por aqui a posição de tray e coordenadas com / e %
-          
-          */
-          break;
-        }
+      if (isIdRepeated == 1) { //se o ID estiver no ficheiro
+        printf("\nRepeated product Id: %d Discarting", trayItemInput.lote.id);
+        continue;
       }
 
+      if (isIdRepeated == 0) {
+        countWhenWritten += 1;
+        trayItemInput.flag = 1;
+        fwrite( & trayItemInput, sizeof(SLOT), 1, filePtrWarehouse);
+        printf("\nId: %d Tray: %d %d -> Slot: %d %d %d",
+          trayItemInput.lote.id,
+          countWhenWritten / 4,
+          countWhenWritten % 4,
+          countWhenWritten / 10, //row
+          countWhenWritten % 10, //collum
+          countWhenWritten / 100 //Shelf
+        );
+
+        break;
+      }
     }
 
   }
@@ -511,7 +484,7 @@ int swapBatch() {
 
   if (filePtrWarehouse == NULL) {
     printf("Error opening binary file\n");
-    exit(1);
+    return 0;
   }
 
   printf("Id: ");
@@ -588,16 +561,6 @@ int swapBatch() {
  ************************************16 - 18 valores***************************************
  ******************************************************************************************/
 
-/*
-struct loteCompleto {
-  int id; //4 bytes
-  char destiny[MAX_DESTINY_STR]; //30 bytes
-  char date[MAX_DATE_STR]; //12 bytes
-  int quantity; //4 bytes
-  int type; //4 bytes
-};
-*/
-
 typedef struct warehouseStatistics {
   int totalCartoes;
   int totalLivretes;
@@ -608,10 +571,19 @@ typedef struct warehouseStatistics {
 CITYVALUES;
 
 int estatisticas() {
+
   FILE * filePtrWarehouse = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
   CITYVALUES destinos[NUM_DISTRITOS_CONTINENTAL];
+
   int i;
+  int index = 0;
+  int isItRepeated;
+  int positionFound = 0;
+
+  int maxNumProduct = 0;
+  int currentTotalNumProduct = 0;
+  float histogramRatio = 0;
 
   for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) { //inicializar
     destinos[i].apperances = 0;
@@ -621,12 +593,8 @@ int estatisticas() {
 
   if (filePtrWarehouse == NULL) {
     printf("Error opening binary file\n");
-    exit(1);
+    return 0;
   }
-  //----------------------------------------------------------------------------------------------
-  int index = 0;
-  int isItRepeated;
-  int positionFound = 0;
 
   while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
     isItRepeated = 0;
@@ -672,7 +640,6 @@ int estatisticas() {
 
     }
 
-
   }
 
   fclose(filePtrWarehouse);
@@ -680,23 +647,18 @@ int estatisticas() {
   for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) {
     if (destinos[i].ocupado == 1) {
       printf("%-12s  Total: %-5d     Cartao: %-5d     Livrete: %d\n",
-      destinos[i].destino,
-      destinos[i].apperances, 
-      destinos[i].totalCartoes, 
-      destinos[i].totalLivretes);
+        destinos[i].destino,
+        destinos[i].apperances,
+        destinos[i].totalCartoes,
+        destinos[i].totalLivretes);
     }
   }
 
-  int maxNumProduct = 0;
-  int currentTotalNumProduct = 0;
-
-  float histogramRatio = 0;
-
   for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) {
     if (destinos[i].ocupado == 1) {
-      currentTotalNumProduct = destinos[i].totalCartoes  + destinos[i].totalLivretes;
-      if(currentTotalNumProduct > maxNumProduct){
-          maxNumProduct = currentTotalNumProduct;
+      currentTotalNumProduct = destinos[i].totalCartoes + destinos[i].totalLivretes;
+      if (currentTotalNumProduct > maxNumProduct) {
+        maxNumProduct = currentTotalNumProduct;
       }
     }
   }
@@ -705,9 +667,9 @@ int estatisticas() {
   int j;
   for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) {
     if (destinos[i].ocupado == 1) {
-      currentTotalNumProduct = destinos[i].totalCartoes  + destinos[i].totalLivretes;
+      currentTotalNumProduct = destinos[i].totalCartoes + destinos[i].totalLivretes;
       printf("\n%-10s  Quantidade total: %-5d    :", destinos[i].destino, currentTotalNumProduct);
-      for(j=0; j<(currentTotalNumProduct/histogramRatio);j++){
+      for (j = 0; j < (currentTotalNumProduct / histogramRatio); j++) {
         printf("*");
       }
     }
@@ -742,10 +704,10 @@ void choices() {
   char choice;
   int choiceSucess = 0;
 
-  FILE * fp;
-  fp = fopen("warehouse.dat", "rb");
-  if (fp == NULL) {
-    printf("Error opening warehouse file\n");
+  FILE * filePtr;
+  filePtr = fopen("warehouse.dat", "rb");
+  if (filePtr == NULL) {
+    printf("Error opening binary file\n");
     exit(1);
   }
 
@@ -784,7 +746,7 @@ void choices() {
 
       break;
     case 'e':
-      fclose(fp);
+      fclose(filePtr);
       exit(1);
       break;
     }
