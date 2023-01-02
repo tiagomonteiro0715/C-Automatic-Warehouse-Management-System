@@ -43,7 +43,7 @@ struct loteCompleto {
  */
 typedef struct slot {
   struct loteCompleto lote;
-  int flag; //0 - livre || 1 - ocupado
+  int flag; //0 - livre || 1 - occupied
 }
 SLOT;
 
@@ -178,7 +178,7 @@ int showTray(bool override) {
     filePtr = fopen("tray.txt", "r");
   }
 
-  /* Checking if the file is open. If it is not, it prints an error message and exits the program. */
+  /* Opening the file and checking if it is null. */
   if (filePtr == NULL) {
     printf("Error opening text file\n");
     return 0;
@@ -220,7 +220,7 @@ int showCompleteBatch() {
 
   int countLine = 0;
 
-  /* Checking if the file is open. If it is not, it prints an error message and exits the program. */
+  /* Opening a file and checking if it is null. */
   if (filePtr == NULL) {
     printf("Error opening binary file\n");
     return 0;
@@ -266,7 +266,7 @@ int batchInfo() {
   scanf("%d", & userInputId);
   getchar();
 
-  /* Opening a file and checking if it is NULL. If it is NULL, it will print an error message and exit. */
+  /* Opening a file and checking if it is null. */
   if (filePtr == NULL) {
     printf("Error opening binary file\n");
     return 0;
@@ -295,6 +295,15 @@ int batchInfo() {
   return 0;
 }
 
+/**
+ * It reads the file, and prints the contents of the file to the screen.
+ * 
+ * @param filePtr pointer to the file
+ * @param structBuffer a struct that holds the data from the file
+ * @param inputShelf 0-4
+ * @param inputStoreTempVar This is a char variable that is used to store the value of the slot's
+ * occupancy.
+ */
 void printInputShelf(FILE * filePtr, SLOT structBuffer, int inputShelf, char inputStoreTempVar) {
   int currentRow = 0;
   int countAllCharParser = 0;
@@ -302,14 +311,20 @@ void printInputShelf(FILE * filePtr, SLOT structBuffer, int inputShelf, char inp
   printf("\n\n -----WAREHOUSE-----\n");
   printf(" 0 1 2 3 4 5 6 7 8 9");
 
+  /* The above code is parsing the file and printing the contents of the file. */
   for (countAllCharParser = 0; fread( & structBuffer, sizeof(SLOT), 1, filePtr); countAllCharParser++) {
 
+    /* Checking if the inputShelf is 0, and if it is, it is checking if the countAllCharParser is greater
+    than 89. If it is, it breaks. */
     if (inputShelf == 0) {
       if ((countAllCharParser > 89)) {
         break;
       }
     }
 
+    /* Checking if the inputShelf is 1, and if it is, it is checking if the countAllCharParser is less than
+    90. If it is, it continues. If it is not, it checks if the countAllCharParser is greater than 179.
+    If it is, it breaks. If it is not, it does nothing. */
     if (inputShelf == 1) {
 
       if (countAllCharParser < 90) {
@@ -319,6 +334,9 @@ void printInputShelf(FILE * filePtr, SLOT structBuffer, int inputShelf, char inp
       }
     }
 
+    /* Checking if the inputShelf is 2, and if it is, it is checking if the countAllCharParser is less than
+    180. If it is, it continues. If it is not, it checks if the countAllCharParser is greater than 269.
+    If it is, it breaks. If it is not, it continues. */
     if (inputShelf == 2) {
 
       if (countAllCharParser < 180) {
@@ -328,6 +346,9 @@ void printInputShelf(FILE * filePtr, SLOT structBuffer, int inputShelf, char inp
       }
     }
 
+    /* Checking if the inputShelf is 3, and if it is, it is checking if the countAllCharParser is less than
+    270, and if it is, it continues. If it is not, it checks if the countAllCharParser is greater than
+    359, and if it is, it breaks. */
     if (inputShelf == 3) {
 
       if (countAllCharParser < 270) {
@@ -337,6 +358,9 @@ void printInputShelf(FILE * filePtr, SLOT structBuffer, int inputShelf, char inp
       }
     }
 
+    /* Checking if the inputShelf is 4, and if it is, it is checking if the countAllCharParser is less than
+    360. If it is, it continues. If it is not, it checks if the countAllCharParser is greater than 449.
+    If it is, it breaks. If it is not, it continues. */
     if (inputShelf == 4) {
 
       if (countAllCharParser < 360) {
@@ -346,19 +370,22 @@ void printInputShelf(FILE * filePtr, SLOT structBuffer, int inputShelf, char inp
       }
     }
 
+    /* Printing the row number. */
     if ((countAllCharParser % 9) == 0) {
 
+      /* Printing a new line every 10 rows. */
       if (((currentRow % 10) == 0) && currentRow != 0) {
         printf("\n");
       }
+      /* Printing the current row number. */
       printf("\n");
       printf(" %d ", currentRow);
       currentRow += 1;
 
     }
 
+    /* Checking the occupancy of the structBuffer and inputStoreTempVar. */
     checkOccupancy( & structBuffer, & inputStoreTempVar);
-
     printf("%c ", inputStoreTempVar);
 
   }
@@ -390,8 +417,9 @@ int warehouseOccupancy() {
     return 0;
   }
 
+  /* Printing the input shelf. */
   switch (userInputIntShelf) {
-  case 0: //fazer função para isto tudo. usar   int shelf = printCurrentLine/10
+  case 0:
     printInputShelf(filePtr, structBuffer, userInputIntShelf, inputStoreTemp);
     break;
 
@@ -418,31 +446,51 @@ int warehouseOccupancy() {
  ************************************13 - 16 valores***************************************
  ******************************************************************************************/
 
+/**
+ * It opens a file, reads a record, compares the record's ID to the ID passed to the function, and
+ * returns 1 if the IDs match, or 0 if they don't
+ * 
+ * @param filePtrWarehouse pointer to the warehouse file
+ * @param ID
+ * 
+ * @return the value of the variable "structBuffer.lote.id"
+ */
 int isIdInWarehouse(FILE * filePtrWarehouse, int ID) {
+
+  /* Opening the file warehouse.dat in read and write mode. */
   filePtrWarehouse = fopen("warehouse.dat", "rb+");
 
+  /* Reading the file and checking if the ID is in the file. */
   SLOT structBuffer;
   while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
 
+    /* Checking if the ID of the lote is the same as the ID of the lote that is being searched for. */
     if ((structBuffer.lote.id) == ID) {
       return 1;
     }
   }
   return 0;
-
 }
 
+/**
+ * It reads a text file with a list of products and writes them to a binary file
+ * 
+ * @return the value 0.
+ */
 int saveTrayToWarehouse() {
 
+  /* Opening the file warehouse.dat and reading it into a buffer. */
   FILE * fpTray;
   FILE * filePtrWarehouse = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
   SLOT trayItemInput;
 
+  /* Declaring a variable of type char and assigning a value to it. */
   char inputTrayName[100];
   char strToReadInput[60];
   int isIdRepeated = 0;
 
+  /* Opening the file for reading. */
   getchar(); // Para apanhar o [enter]
   printf("Tray Filename: ");
   scanf("%s", inputTrayName);
@@ -459,28 +507,34 @@ int saveTrayToWarehouse() {
     return 0;
   }
 
+  /* Reading the file and writing it to another file. */
   int countWhenWritten = 0;
   while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
+
+    /* Writing the structBuffer to the filePtrWarehouse. */
     if (structBuffer.flag == 1) {
       fwrite( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);
       continue;
     }
 
+    /* Reading the file and writing it to another file. */
     while (fgets(strToReadInput, sizeof(strToReadInput), fpTray)) {
 
+      /* Reading the input from the file and storing it in the struct. */
       sscanf(strToReadInput, "%d %s %s %d %d", &
         trayItemInput.lote.id,
         trayItemInput.lote.destiny,
         trayItemInput.lote.date, &
         trayItemInput.lote.quantity, & trayItemInput.lote.type);
 
+      /* Checking if the ID is repeated in the file. */
       isIdRepeated = isIdInWarehouse(filePtrWarehouse, trayItemInput.lote.id);
-
       if (isIdRepeated == 1) { //se o ID estiver no ficheiro
         printf("\nRepeated product Id: %d Discarting", trayItemInput.lote.id);
         continue;
       }
 
+      /* Checking if the id is repeated. If it is not repeated, it will write the trayItemInput to the file. */
       if (isIdRepeated == 0) {
         countWhenWritten += 1;
         trayItemInput.flag = 1;
@@ -499,14 +553,21 @@ int saveTrayToWarehouse() {
     }
 
   }
+  /* Closing the file pointers. */
   fclose(fpTray);
   fclose(filePtrWarehouse);
 
   return 0;
 }
 
+/**
+ * It's supposed to swap two slots in a binary file
+ * 
+ * @return the value 0.
+ */
 int swapBatch() {
 
+  /* Declaring variables and opening the file. */
   FILE * filePtrWarehouse = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
 
@@ -528,14 +589,15 @@ int swapBatch() {
     return 0;
   }
 
+  /* Checking if the inputID is in the warehouse. */
   printf("Id: ");
   scanf("%d", & inputID);
-
   if (isIdInWarehouse(filePtrWarehouse, inputID) == 0) {
     printf("Batch Id not stored in warehouse");
     return 0;
   }
 
+  /* Asking the user to input the row, collum and shelf. */
   printf("Row: ");
   scanf("%d", & inputRow);
 
@@ -545,13 +607,14 @@ int swapBatch() {
   printf("Shelf: ");
   scanf("%d", & inputShelf);
 
+  /* Checking if the position is greater than 500. */
   chosenPosition = inputCollum + (inputRow * 10) + (inputShelf * 100);
-
   if (chosenPosition > 500) {
     printf("\nSuch position does not exist in the warehouse");
     return 0;
   }
 
+  /* Reading the file and storing the data in a buffer. */
   for (i = 0; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
     if (structBuffer.lote.id == inputID) {
       structChosen = structBuffer;
@@ -561,9 +624,10 @@ int swapBatch() {
     if (i == chosenPosition) {
       structToDisplace = structBuffer;
     }
-
   }
 
+  /* Checking if the user has chosen the same position as the one found. If so, it will print a message
+  and return 0. If not, it will print a message. */
   if (chosenPosition == positionIdFound) {
     printf("\nYou choose with same slots. Please try again");
     return 0;
@@ -582,9 +646,11 @@ int swapBatch() {
       structToDisplace.lote.type);
   }
 
+  /* Reading the file and writing it back to the file. */
   while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
-    fwrite( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);
 
+    /* Writing the structBuffer to the filePtrWarehouse. */
+    fwrite( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);
     if (i == chosenPosition) {
       fwrite( & structChosen, sizeof(SLOT), 1, filePtrWarehouse);
     } else if (i == positionIdFound) {
@@ -596,6 +662,7 @@ int swapBatch() {
     i = i + 1;
   }
 
+  /* Opening a file and reading the data from it. */
   fclose(filePtrWarehouse);
 
   return 0;
@@ -604,21 +671,36 @@ int swapBatch() {
  ************************************16 - 18 valores***************************************
  ******************************************************************************************/
 
+/**
+ * CITYVALUES is a type that contains a bunch of integers and a character array.
+ * @property {int} totalcards - The number of cards that are in the warehouse to the destiny
+ * @property {int} totalBooklets - The total number of booklets that will be sent to the city.
+ * @property {int} occupied - Indicating that this city has cards and booklets to send to a city
+ * @property {int} apperances - How many times the city has appeared in the warehouse.
+ * @property {char} finalDestiny - The name of the city to be sent
+ */
 typedef struct warehouseStatistics {
-  int totalCartoes;
-  int totalLivretes;
-  int ocupado;
+  int totalcards;
+  int totalBooklets;
+  int occupied;
   int apperances;
-  char destino[12];
+  char finalDestiny[12];
 }
 CITYVALUES;
 
+/**
+ * It reads a binary file and prints some statistics about it
+ * 
+ * @return the number of products in the warehouse.
+ */
 int estatisticas() {
 
+  /* Opening a file, creating a structure, and creating an array of structures. */
   FILE * filePtrWarehouse = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
-  CITYVALUES destinos[NUM_DISTRITOS_CONTINENTAL];
+  CITYVALUES finalDestinys[NUM_DISTRITOS_CONTINENTAL];
 
+  /* Declaring the variables that will be used in the program. */
   int i;
   int index = 0;
   int isItRepeated;
@@ -628,10 +710,11 @@ int estatisticas() {
   int currentTotalNumProduct = 0;
   float histogramRatio = 0;
 
-  for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) { //inicializar
-    destinos[i].apperances = 0;
-    destinos[i].totalCartoes = 0;
-    destinos[i].totalLivretes = 0;
+  /* Initializing the array of structs. */
+  for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) {
+    finalDestinys[i].apperances = 0;
+    finalDestinys[i].totalcards = 0;
+    finalDestinys[i].totalBooklets = 0;
   }
 
   if (filePtrWarehouse == NULL) {
@@ -639,45 +722,60 @@ int estatisticas() {
     return 0;
   }
 
+  /* Reading a file and storing the data in an array of structs. */
   while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
     isItRepeated = 0;
+
+    /* Checking if the flag is set to 0. If it is, it will skip the rest of the code and go to the next
+    iteration of the loop. */
     if (structBuffer.flag == 0) {
       continue;
     }
+
+    /* Reading the file and storing the data in an array of structs. */
     if (!(isnull(structBuffer.lote.destiny)) && (structBuffer.flag)) {
 
+      /* Checking if the finalDestiny is already in the array. If it is, it increments the apperances and
+      adds the quantity to the totalcards or totalBooklets. */
       for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) {
-        if (!strcmp(destinos[i].destino, structBuffer.lote.destiny)) {
+        if (!strcmp(finalDestinys[i].finalDestiny, structBuffer.lote.destiny)) {
           positionFound = i;
-          destinos[positionFound].apperances = destinos[positionFound].apperances + 1;
+          finalDestinys[positionFound].apperances = finalDestinys[positionFound].apperances + 1;
 
+          /* Checking if the type of the lot is 1, if it is, it is adding the quantity of the lot to the
+          totalcards of the finalDestinys array. */
           if (structBuffer.lote.type == 1) { //cartoes
-            destinos[positionFound].totalCartoes = destinos[positionFound].totalCartoes + structBuffer.lote.quantity;
+            finalDestinys[positionFound].totalcards = finalDestinys[positionFound].totalcards + structBuffer.lote.quantity;
             isItRepeated = 1;
             break;
           }
 
+          /* Checking if the type of the structBuffer is 2, if it is, it is adding the quantity of the
+          structBuffer to the totalBooklets of the finalDestinys. */
           if (structBuffer.lote.type == 2) { //livretes
-            destinos[positionFound].totalLivretes = destinos[positionFound].totalLivretes + structBuffer.lote.quantity;
+            finalDestinys[positionFound].totalBooklets = finalDestinys[positionFound].totalBooklets + structBuffer.lote.quantity;
             isItRepeated = 1;
             break;
           }
         }
       }
+      /* Checking if the number is repeated. If it is, it will continue to the next number. */
       if (isItRepeated == 1) {
         continue;
       }
 
-      strcpy(destinos[index].destino, structBuffer.lote.destiny);
-      destinos[index].apperances = destinos[index].apperances + 1;
-      destinos[index].ocupado = 1;
+      /* Adding the data to the array of structs. */
+      strcpy(finalDestinys[index].finalDestiny, structBuffer.lote.destiny);
+      finalDestinys[index].apperances = finalDestinys[index].apperances + 1;
+      finalDestinys[index].occupied = 1;
 
-      if (structBuffer.lote.type == 1) { //cartoes
-        destinos[index].totalCartoes = destinos[index].totalCartoes + structBuffer.lote.quantity;
+      /* Adding the quantity of cards and booklets to the finalDestinys array. */
+      if (structBuffer.lote.type == 1) {
+        finalDestinys[index].totalcards = finalDestinys[index].totalcards + structBuffer.lote.quantity;
       }
 
-      if (structBuffer.lote.type == 2) { //livretes
-        destinos[index].totalLivretes = destinos[index].totalLivretes + structBuffer.lote.quantity;
+      if (structBuffer.lote.type == 2) {
+        finalDestinys[index].totalBooklets = finalDestinys[index].totalBooklets + structBuffer.lote.quantity;
       }
       index = index + 1;
 
@@ -687,19 +785,21 @@ int estatisticas() {
 
   fclose(filePtrWarehouse);
 
+  /* Printing the finalDestinys array. */
   for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) {
-    if (destinos[i].ocupado == 1) {
+    if (finalDestinys[i].occupied == 1) {
       printf("%-12s  Total: %-5d     Cartao: %-5d     Livrete: %d\n",
-        destinos[i].destino,
-        destinos[i].apperances,
-        destinos[i].totalCartoes,
-        destinos[i].totalLivretes);
+        finalDestinys[i].finalDestiny,
+        finalDestinys[i].apperances,
+        finalDestinys[i].totalcards,
+        finalDestinys[i].totalBooklets);
     }
   }
 
+  /* Printing a histogram of the number of products in each final destination. */
   for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) {
-    if (destinos[i].ocupado == 1) {
-      currentTotalNumProduct = destinos[i].totalCartoes + destinos[i].totalLivretes;
+    if (finalDestinys[i].occupied == 1) {
+      currentTotalNumProduct = finalDestinys[i].totalcards + finalDestinys[i].totalBooklets;
       if (currentTotalNumProduct > maxNumProduct) {
         maxNumProduct = currentTotalNumProduct;
       }
@@ -707,12 +807,13 @@ int estatisticas() {
   }
   histogramRatio = (maxNumProduct / 50);
 
-  int j;
   for (i = 0; i < NUM_DISTRITOS_CONTINENTAL; i++) {
-    if (destinos[i].ocupado == 1) {
-      currentTotalNumProduct = destinos[i].totalCartoes + destinos[i].totalLivretes;
-      printf("\n%-10s  Quantidade total: %-5d    :", destinos[i].destino, currentTotalNumProduct);
-      for (j = 0; j < (currentTotalNumProduct / histogramRatio); j++) {
+    /* Printing the histogram. */
+    if (finalDestinys[i].occupied == 1) {
+      currentTotalNumProduct = finalDestinys[i].totalcards + finalDestinys[i].totalBooklets;
+      printf("\n%-10s  Quantidade total: %-5d    :", finalDestinys[i].finalDestiny, currentTotalNumProduct);
+      /* Printing out each line of astericks. */
+      for (int j = 0; j < (currentTotalNumProduct / histogramRatio); j++) {
         printf("*");
       }
     }
@@ -763,7 +864,6 @@ void choices() {
       break;
     case '2':
       showCompleteBatch();
-
       showMenu();
       break;
     case '3':
