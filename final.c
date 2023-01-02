@@ -552,6 +552,7 @@ int swapBatch() {
     return 0;
   }
 
+
   for (i = 1; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
     if (structBuffer.lote.id == inputID) {
       structChosen = structBuffer;
@@ -559,30 +560,42 @@ int swapBatch() {
       break;
     }
   }
-  /*
+
+  
   printf("\n\n== Position found %d==\n\n", positionIdFound);
 
   printf("%d %s %s %d %d",
     structChosen.lote.id,
-    structBuffer.lote.destiny,
-    structBuffer.lote.date,
-    structBuffer.lote.quantity,
-    structBuffer.lote.type
+    structChosen.lote.destiny,
+    structChosen.lote.date,
+    structChosen.lote.quantity,
+    structChosen.lote.type
   );
-*/
+
 
   for (i = 1; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
-    if (structBuffer.lote.id == chosenPosition) {
+    if (i == chosenPosition) {
       structToDisplace = structBuffer;
-      positionIdFound = i;
+      //positionIdFound = i;
       break;
     }
   }
 
+  printf("\n\n== Position found %d==\n\n", chosenPosition);
+
+  printf("%d %s %s %d %d",
+    structToDisplace.lote.id,
+    structToDisplace.lote.destiny,
+    structToDisplace.lote.date,
+    structToDisplace.lote.quantity,
+    structToDisplace.lote.type
+  );
+
+
+
   FILE * filePtrTest = fopen("warehouse1.dat", "wb+");
 
-  for (i = 1; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
-    fwrite( & structBuffer, sizeof(SLOT), 1, filePtrTest);
+  for (i = 0; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
 
     if (i == chosenPosition) {
       fwrite( & structToDisplace, sizeof(SLOT), 1, filePtrTest);
@@ -590,6 +603,8 @@ int swapBatch() {
     } else if (i == positionIdFound) {
       fwrite( & structChosen, sizeof(SLOT), 1, filePtrTest);
       continue;
+    }else{
+      fwrite( & structBuffer, sizeof(SLOT), 1, filePtrTest);
     }
   }
 
@@ -727,8 +742,8 @@ void showMenu() {
 
   printf("\n\n1 - Show tray\n");
 
-  printf("2 - Show batch info\n");
-  printf("3 - List batches\n");
+  printf("2 - List batches \n");
+  printf("3 - Show batch info \n");
   printf("4 - Show wharehouse occupancy\n\n");
 
   printf("5 - Store tray\n");
@@ -760,11 +775,12 @@ void choices() {
       showMenu();
       break;
     case '2':
-      batchInfo();
+showCompleteBatch();
+      
       showMenu();
       break;
     case '3':
-      showCompleteBatch();
+      batchInfo();
       showMenu();
       break;
     case '4':
