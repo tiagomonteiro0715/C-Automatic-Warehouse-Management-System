@@ -215,7 +215,7 @@ int showTray(bool override) {
 int showCompleteBatch() {
 
   /* Opening the file warehouse.dat in binary mode for reading and writing. */
-  FILE * filePtr = fopen("warehouse1.dat", "rb+");
+  FILE * filePtr = fopen("warehouse.dat", "rb+");
   SLOT structBuffer;
 
   int countLine = 0;
@@ -552,64 +552,51 @@ int swapBatch() {
     return 0;
   }
 
-
-  for (i = 1; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
+  for (i = 0; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
     if (structBuffer.lote.id == inputID) {
       structChosen = structBuffer;
       positionIdFound = i;
-      break;
     }
-  }
 
-  
-  printf("\n\n== Position found %d==\n\n", positionIdFound);
-
-  printf("%d %s %s %d %d",
-    structChosen.lote.id,
-    structChosen.lote.destiny,
-    structChosen.lote.date,
-    structChosen.lote.quantity,
-    structChosen.lote.type
-  );
-
-
-  for (i = 1; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
     if (i == chosenPosition) {
       structToDisplace = structBuffer;
-      //positionIdFound = i;
-      break;
     }
+
   }
 
-  printf("\n\n== Position found %d==\n\n", chosenPosition);
+  if (chosenPosition == positionIdFound) {
+    printf("\nYou choose with same slots. Please try again");
+    return 0;
+  } else {
+    printf("\n\n Switch slot (%d %s %s %d %d) with slot (%d %s %s %d %d) \n\n",
+      structChosen.lote.id,
+      structChosen.lote.destiny,
+      structChosen.lote.date,
+      structChosen.lote.quantity,
+      structChosen.lote.type,
 
-  printf("%d %s %s %d %d",
-    structToDisplace.lote.id,
-    structToDisplace.lote.destiny,
-    structToDisplace.lote.date,
-    structToDisplace.lote.quantity,
-    structToDisplace.lote.type
-  );
+      structToDisplace.lote.id,
+      structToDisplace.lote.destiny,
+      structToDisplace.lote.date,
+      structToDisplace.lote.quantity,
+      structToDisplace.lote.type);
+  }
 
-
-
-  FILE * filePtrTest = fopen("warehouse1.dat", "wb+");
-
-  for (i = 0; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
+  while (fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse)) {
+    fwrite( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);
 
     if (i == chosenPosition) {
-      fwrite( & structToDisplace, sizeof(SLOT), 1, filePtrTest);
-      continue;
+      fwrite( & structChosen, sizeof(SLOT), 1, filePtrWarehouse);
     } else if (i == positionIdFound) {
-      fwrite( & structChosen, sizeof(SLOT), 1, filePtrTest);
-      continue;
-    }else{
-      fwrite( & structBuffer, sizeof(SLOT), 1, filePtrTest);
+      fwrite( & structToDisplace, sizeof(SLOT), 1, filePtrWarehouse);
+    } else {
+      fwrite( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse);
     }
+
+    i = i + 1;
   }
 
   fclose(filePtrWarehouse);
-  fclose(filePtrTest);
 
   return 0;
 }
@@ -775,8 +762,8 @@ void choices() {
       showMenu();
       break;
     case '2':
-showCompleteBatch();
-      
+      showCompleteBatch();
+
       showMenu();
       break;
     case '3':
