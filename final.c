@@ -215,7 +215,7 @@ int showTray(bool override) {
 int showCompleteBatch() {
 
   /* Opening the file warehouse.dat in binary mode for reading and writing. */
-  FILE * filePtr = fopen("warehouse.dat", "rb+");
+  FILE * filePtr = fopen("warehouse1.dat", "rb+");
   SLOT structBuffer;
 
   int countLine = 0;
@@ -296,28 +296,71 @@ int batchInfo() {
 }
 
 void printInputShelf(FILE * filePtr, SLOT structBuffer, int inputShelf, char inputStoreTempVar) {
-  int printCurrentLine = 0;
-  int countAllCharParser;
-  int currentShelf;
+  int currentRow = 0;
+  int countAllCharParser = 0;
 
   printf("\n\n -----WAREHOUSE-----\n");
-  printf(" 0 1 2 3 4 5 6 7 8 9\n");
+  printf(" 0 1 2 3 4 5 6 7 8 9");
 
   for (countAllCharParser = 0; fread( & structBuffer, sizeof(SLOT), 1, filePtr); countAllCharParser++) {
-    if (!(countAllCharParser % 9 && (countAllCharParser != 0))) {
-      if (currentShelf == inputShelf) {
-        printf(" %d ", (printCurrentLine % 10));
+
+    if (inputShelf == 0) {
+      if ((countAllCharParser > 89)) {
+        break;
       }
-      //printf("\n %d ", (printCurrentLine)); //% 10
-      printCurrentLine += 1;
+    }
+
+    if (inputShelf == 1) {
+
+      if (countAllCharParser < 90) {
+        continue;
+      } else if ((countAllCharParser > 179)) {
+        break;
+      }
+    }
+
+    if (inputShelf == 2) {
+
+      if (countAllCharParser < 180) {
+        continue;
+      } else if ((countAllCharParser > 269)) {
+        break;
+      }
+    }
+
+    if (inputShelf == 3) {
+
+      if (countAllCharParser < 270) {
+        continue;
+      } else if ((countAllCharParser > 359)) {
+        break;
+      }
+    }
+
+    if (inputShelf == 4) {
+
+      if (countAllCharParser < 360) {
+        continue;
+      } else if ((countAllCharParser > 449)) {
+        break;
+      }
+    }
+
+    if ((countAllCharParser % 9) == 0) {
+
+      if (((currentRow % 10) == 0) && currentRow != 0) {
+        printf("\n");
+      }
+      printf("\n");
+      printf(" %d ", currentRow);
+      currentRow += 1;
+
     }
 
     checkOccupancy( & structBuffer, & inputStoreTempVar);
-    if (currentShelf == inputShelf) {
-      printf("%c ", inputStoreTempVar);
-    }
-    //printf("%c ", inputStoreTempVar);
-    currentShelf = printCurrentLine / 10;
+
+    printf("%c ", inputStoreTempVar);
+
   }
 }
 
@@ -370,8 +413,6 @@ int warehouseOccupancy() {
   }
   return 0;
 }
-
-
 
 /*****************************************************************************************
  ************************************13 - 16 valores***************************************
@@ -538,7 +579,7 @@ int swapBatch() {
     }
   }
 
-  FILE * filePtrTest = fopen("warehouse.dat", "wb+");
+  FILE * filePtrTest = fopen("warehouse1.dat", "wb+");
 
   for (i = 1; fread( & structBuffer, sizeof(SLOT), 1, filePtrWarehouse); i++) {
     fwrite( & structBuffer, sizeof(SLOT), 1, filePtrTest);
